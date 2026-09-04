@@ -1,0 +1,125 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ProjectImageType {
+  id: ID!
+  url: String!
+  order: Int!
+}
+
+type ProjectType {
+  id: ID!
+  name: String!
+  description: String!
+  repoUrl: String
+  liveUrl: String
+  stack: [String!]!
+  order: Int!
+  images: [ProjectImageType!]!
+}
+
+type SkillType {
+  id: ID!
+  name: String!
+  category: SkillCategory!
+  level: Int!
+  order: Int!
+}
+
+enum SkillCategory {
+  LANGUAGE
+  BACKEND
+  FRONTEND
+  DATABASE
+  INFRA
+  TOOL
+}
+
+type ProfileLinkType {
+  id: ID!
+  kind: LinkKind!
+  label: String!
+  url: String!
+  order: Int!
+}
+
+enum LinkKind {
+  GITHUB
+  LINKEDIN
+  TELEGRAM
+  EMAIL
+  WEBSITE
+}
+
+type AchievementType {
+  id: ID!
+  text: String!
+  order: Int!
+}
+
+type ExperienceType {
+  id: ID!
+  company: String!
+  position: String!
+  description: String
+  startDate: DateTime!
+  endDate: DateTime
+  achievements: [AchievementType!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ProfileType {
+  id: ID!
+  name: String!
+  headline: String!
+  description: String!
+  email: String!
+  location: String
+  links: [ProfileLinkType!]!
+  skills: [SkillType!]!
+  experience: [ExperienceType!]!
+  projects: [ProjectType!]!
+}
+
+type Query {
+  profile: ProfileType
+  projects: [ProjectType!]!
+  skills: [SkillType!]!
+  skill(id: ID!): SkillType
+}
+
+type Mutation {
+  createProject(input: CreateProjectInput!): ProjectType!
+  createSkill(input: CreateSkillInput!): SkillType!
+  updateSkill(input: UpdateSkillInput!): SkillType!
+  deleteSkill(id: ID!): SkillType!
+}
+
+input CreateProjectInput {
+  name: String!
+  description: String!
+  repoUrl: String
+  liveUrl: String
+  stack: [String!]!
+  order: Int!
+}
+
+input CreateSkillInput {
+  name: String!
+  category: SkillCategory!
+  level: Int!
+  order: Int!
+}
+
+input UpdateSkillInput {
+  name: String
+  category: SkillCategory
+  level: Int
+  order: Int
+  id: ID!
+}
