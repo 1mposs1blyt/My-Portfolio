@@ -12,12 +12,20 @@ import { validate } from './config/env.schema.js';
 import { ProfileModule } from './profile/profile.module.js';
 import { ProjectsModule } from './projects/projects.module.js';
 import { SkillsModule } from './skills/skills.module.js';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
+    }),
+    ServeStaticModule.forRoot({
+      // process.cwd() — это корень всего твоего приложения NestJS
+      rootPath: join(process.cwd(), 'public'),
+
+      // Ссылка, по которой картинки будут доступны в браузере
+      serveRoot: '/public',
     }),
     PrismaModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({

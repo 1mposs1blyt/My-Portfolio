@@ -22,6 +22,15 @@ export default function ProjectCard({ p, t, onOpen }: ProjectCardProps) {
     ? decodeURIComponent(coverUrl.replace("data:image/svg+xml,", ""))
     : "";
 
+  // 💡 Страховка: если Vite не прочитал .env, принудительно берем порт 3333 бэкенда
+  const rawEnvUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = rawEnvUrl && rawEnvUrl.trim() !== "" ? rawEnvUrl : "http://localhost:3333";
+
+  // 💡 Мягкая и безопасная склейка: ищет public в любом месте строки (со слэшем или без)
+  const fullCoverUrl = coverUrl.includes("public")
+    ? `${backendUrl}${coverUrl.startsWith("/") ? "" : "/"}${coverUrl}`
+    : coverUrl;
+
   return (
     <article className="b-window b-card">
       <div className="b-window-bar">
@@ -44,7 +53,7 @@ export default function ProjectCard({ p, t, onOpen }: ProjectCardProps) {
               className="b-svg-wrapper"
             />
           ) : (
-            <img src={coverUrl} alt="" />
+            <img src={fullCoverUrl} alt="" />
           )}
           {p.images.length > 1 && (
             <span className="b-stackmark">+{p.images.length - 1}</span>
