@@ -1,98 +1,82 @@
 import React, { useState } from "react";
 import { useAdminToken } from "./hooks/useAdminToken";
-
 type Section = {
   id: string;
   label: string;
 };
-
-const SECTIONS: Section[] = [
-  { id: "profile", label: "Профиль" },
-  { id: "skills", label: "Навыки" },
-  { id: "links", label: "Контакты" },
-  { id: "experience", label: "Опыт" },
-  { id: "projects", label: "Проекты" },
-  { id: "reviews", label: "Отзывы" }
-];
-
+const SECTIONS: Section[] = [{
+  id: "profile",
+  label: "Профиль"
+}, {
+  id: "skills",
+  label: "Навыки"
+}, {
+  id: "links",
+  label: "Контакты"
+}, {
+  id: "experience",
+  label: "Опыт"
+}, {
+  id: "projects",
+  label: "Проекты"
+}, {
+  id: "reviews",
+  label: "Отзывы"
+}];
 type AdminShellProps = {
   active: string;
   onNavigate: (id: string) => void;
   children: React.ReactNode;
 };
-
 export default function AdminShell({
   active,
   onNavigate,
-  children,
+  children
 }: AdminShellProps) {
-  const { token, setToken, isEditor } = useAdminToken();
+  const {
+    token,
+    setToken,
+    isEditor
+  } = useAdminToken();
   const [draft, setDraft] = useState("");
-
   const apply = () => {
     setToken(draft.trim());
     setDraft("");
   };
-
-  return (
-    <div className="adm-root">
-      {!isEditor && (
-        <div className="adm-banner">
+  return <div className="adm-root">
+      {!isEditor && <div className="adm-banner">
           <span>
             Демо-режим. Изменения видите только вы, при перезагрузке страницы
             всё вернётся.
           </span>
-          <a
-            href="https://github.com/1mposs1blyt"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://github.com/1mposs1blyt" target="_blank" rel="noreferrer">
             исходники
           </a>
-        </div>
-      )}
+        </div>}
 
       <div className="adm-body">
         <aside className="adm-side">
           <div className="adm-side-title">admin</div>
 
           <nav className="adm-nav">
-            {SECTIONS.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => onNavigate(s.id)}
-                data-on={String(active === s.id)}
-              >
+            {SECTIONS.map(s => <button key={s.id} onClick={() => onNavigate(s.id)} data-on={String(active === s.id)}>
                 {s.label}
-              </button>
-            ))}
+              </button>)}
           </nav>
 
           <div className="adm-token">
-            {isEditor ? (
-              <>
+            {isEditor ? <>
                 <div className="adm-token-on">режим записи</div>
                 <button className="adm-btn" onClick={() => setToken("")}>
                   выйти
                 </button>
-              </>
-            ) : (
-              <>
+              </> : <>
                 <label htmlFor="adm-token-input">токен</label>
-                <input
-                  id="adm-token-input"
-                  type="password"
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && apply()}
-                  placeholder="вставь и нажми Enter"
-                  autoComplete="off"
-                />
+                <input id="adm-token-input" type="password" value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => e.key === "Enter" && apply()} placeholder="вставь и нажми Enter" autoComplete="off" />
                 <button className="adm-btn" onClick={apply} disabled={!draft.trim()}>
                   войти
                 </button>
-              </>
-            )}
+              </>}
           </div>
 
           <a className="adm-back" href="/">
@@ -102,6 +86,5 @@ export default function AdminShell({
 
         <main className="adm-main">{children}</main>
       </div>
-    </div>
-  );
+    </div>;
 }

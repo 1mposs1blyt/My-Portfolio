@@ -6,56 +6,63 @@ import { ReviewType, ReviewTokenValidType } from './dto/reviews.type.js';
 import { ReviewTokenType } from './dto/review-token.type.js';
 import { CreateReviewInput } from './dto/create-review.input.js';
 import { CreateReviewTokenInput } from './dto/create-review-token.input.js';
-
 @Resolver()
 export class ReviewsResolver {
   constructor(private readonly reviewsService: ReviewsService) {}
-
-  /* ── публичное ─────────────────────────────── */
-
-  @Query(() => [ReviewType], { name: 'reviews' })
+  @Query(() => [ReviewType], {
+    name: 'reviews'
+  })
   async getReviews() {
     return this.reviewsService.findAll();
   }
-
-  @Query(() => ReviewTokenValidType, { name: 'validateReviewToken' })
-  async validateReviewToken(@Args('token') token: string) {
+  @Query(() => ReviewTokenValidType, {
+    name: 'validateReviewToken'
+  })
+  async validateReviewToken(@Args('token')
+  token: string) {
     return this.reviewsService.validateToken(token);
   }
-
-  @Mutation(() => ReviewType, { name: 'submitReview' })
-  async submitReview(@Args('input') input: CreateReviewInput) {
+  @Mutation(() => ReviewType, {
+    name: 'submitReview'
+  })
+  async submitReview(@Args('input')
+  input: CreateReviewInput) {
     return this.reviewsService.createWithToken(input);
   }
-
-  /* ── админское ─────────────────────────────── */
-
-  @Query(() => [ReviewTokenType], { name: 'reviewTokens' })
+  @Query(() => [ReviewTokenType], {
+    name: 'reviewTokens'
+  })
   @UseGuards(AdminGuard)
   async getReviewTokens() {
     return this.reviewsService.findTokens();
   }
-
-  @Mutation(() => ReviewTokenType, { name: 'createReviewToken' })
+  @Mutation(() => ReviewTokenType, {
+    name: 'createReviewToken'
+  })
   @UseGuards(AdminGuard)
-  async createReviewToken(@Args('input') input: CreateReviewTokenInput) {
+  async createReviewToken(@Args('input')
+  input: CreateReviewTokenInput) {
     return this.reviewsService.createToken(input);
   }
-
-  @Mutation(() => Boolean, { name: 'revokeReviewToken' })
+  @Mutation(() => Boolean, {
+    name: 'revokeReviewToken'
+  })
   @UseGuards(AdminGuard)
-  async revokeReviewToken(
-    @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
-  ) {
+  async revokeReviewToken(@Args('id', {
+    type: () => ID
+  }, ParseUUIDPipe)
+  id: string) {
     await this.reviewsService.revokeToken(id);
     return true;
   }
-
-  @Mutation(() => Boolean, { name: 'deleteReview' })
+  @Mutation(() => Boolean, {
+    name: 'deleteReview'
+  })
   @UseGuards(AdminGuard)
-  async deleteReview(
-    @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
-  ) {
+  async deleteReview(@Args('id', {
+    type: () => ID
+  }, ParseUUIDPipe)
+  id: string) {
     await this.reviewsService.removeReview(id);
     return true;
   }

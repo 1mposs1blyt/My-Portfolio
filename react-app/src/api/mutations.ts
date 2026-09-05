@@ -1,5 +1,4 @@
 import { gql } from "urql";
-
 export const SUBMIT_REVIEW_MUTATION = gql`
   mutation SubmitReview($input: CreateReviewInput!) {
     submitReview(input: $input) {
@@ -8,7 +7,6 @@ export const SUBMIT_REVIEW_MUTATION = gql`
     }
   }
 `;
-
 export const VALIDATE_TOKEN_QUERY = gql`
   query ValidateReviewToken($token: String!) {
     validateReviewToken(token: $token) {

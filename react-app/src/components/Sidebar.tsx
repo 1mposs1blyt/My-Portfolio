@@ -1,6 +1,5 @@
 import React from "react";
 import { LangType } from "../types/portfolio";
-
 type SidebarProps = {
   lang: LangType;
   setLang: (lang: LangType) => void;
@@ -11,7 +10,6 @@ type SidebarProps = {
   headline: string;
   available?: string[];
 };
-
 export default function Sidebar({
   lang,
   setLang,
@@ -20,14 +18,10 @@ export default function Sidebar({
   t,
   name,
   headline,
-  available,
+  available
 }: SidebarProps) {
-  const items = available
-    ? t.tree.filter((n: any) => available.includes(n.id))
-    : t.tree;
-
-  return (
-    <aside className="b-side">
+  const items = available ? t.tree.filter((n: any) => available.includes(n.id)) : t.tree;
+  return <aside className="b-side">
       <div className="b-side-id">
         <div className="b-side-name">{name}</div>
         <div className="b-side-role">{headline}</div>
@@ -39,21 +33,12 @@ export default function Sidebar({
 
       <nav className="b-tree">
         {items.map((n: any) => {
-          const on = active === n.id;
-          return (
-            <button
-              key={n.id}
-              onClick={() => onNavigate(n.id)}
-              data-on={String(on)}
-              aria-current={on ? "true" : undefined}
-            >
+        const on = active === n.id;
+        return <button key={n.id} onClick={() => onNavigate(n.id)} data-on={String(on)} aria-current={on ? "true" : undefined}>
               <span>{n.file}</span>
-              {typeof n.count === "number" && n.count > 0 ? (
-                <span className="b-tree-count">{n.count}</span>
-              ) : null}
-            </button>
-          );
-        })}
+              {typeof n.count === "number" && n.count > 0 ? <span className="b-tree-count">{n.count}</span> : null}
+            </button>;
+      })}
       </nav>
 
       <div className="b-side-foot">
@@ -72,6 +57,5 @@ export default function Sidebar({
           admin
         </a>
       </div>
-    </aside>
-  );
+    </aside>;
 }

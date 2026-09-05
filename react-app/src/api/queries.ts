@@ -1,5 +1,4 @@
 import { gql } from "urql";
-
 export const GET_PORTFOLIO_DATA = gql`
   query GetPortfolioData {
     profile {
@@ -8,28 +7,44 @@ export const GET_PORTFOLIO_DATA = gql`
       description
       location
       email
-      links { kind label url order }
-      skills { name category level order }
-      experience { 
-        company 
-        position 
-        description 
-        startDate 
-        endDate 
-        achievements { text order } 
+      links {
+        kind
+        label
+        url
+        order
       }
-      projects { 
-        id 
-        name 
-        description 
-        repoUrl 
-        liveUrl 
-        stack 
-        order 
-        images { url order } 
+      skills {
+        name
+        category
+        level
+        order
+      }
+      experience {
+        company
+        position
+        description
+        startDate
+        endDate
+        achievements {
+          text
+          order
+        }
+      }
+      projects {
+        id
+        name
+        description
+        repoUrl
+        liveUrl
+        stack
+        order
+        images {
+          url
+          order
+        }
       }
     }
-    
+
     reviews {
       id
       type

@@ -19,10 +19,27 @@ query {
   profile {
     name
     headline
-    links { kind url }
-    skills { name category }
-    experience { company position period achievements { text } }
-    projects { name repoUrl stack }
+    links {
+      kind
+      url
+    }
+    skills {
+      name
+      category
+    }
+    experience {
+      company
+      position
+      period
+      achievements {
+        text
+      }
+    }
+    projects {
+      name
+      repoUrl
+      stack
+    }
   }
 }
 ```
@@ -38,13 +55,13 @@ npm run db:seed
 npm run start:dev
 ```
 
-| Команда                          | Что делает                                   |
-| --------------------------------------- | ----------------------------------------------------- |
-| `npm run start:dev`                   | запуск с hot reload                            |
-| `npm run db:migrate`                  | создать и применить миграцию |
-| `npm run db:seed`                     | заполнить базу                           |
-| `npm run test` / `npm run test:e2e` | тесты                                            |
-| `npm run lint`                        | oxlint                                                |
+| Команда                             | Что делает                   |
+| ----------------------------------- | ---------------------------- |
+| `npm run start:dev`                 | запуск с hot reload          |
+| `npm run db:migrate`                | создать и применить миграцию |
+| `npm run db:seed`                   | заполнить базу               |
+| `npm run test` / `npm run test:e2e` | тесты                        |
+| `npm run lint`                      | oxlint                       |
 
 ## Схема данных
 

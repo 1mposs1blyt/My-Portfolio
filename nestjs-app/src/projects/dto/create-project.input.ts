@@ -1,36 +1,37 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
-import {
-  IsArray,
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUrl,
-} from 'class-validator';
-
+import { IsArray, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
 @InputType()
 export class CreateProjectInput {
   @Field()
-  @IsString() @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   name: string;
-
   @Field()
-  @IsString() @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   description: string;
-
-  @Field({ nullable: true })
-  @IsOptional() @IsUrl()
+  @Field({
+    nullable: true
+  })
+  @IsOptional()
+  @IsUrl()
   repoUrl?: string;
-
-  @Field({ nullable: true })
-  @IsOptional() @IsUrl()
+  @Field({
+    nullable: true
+  })
+  @IsOptional()
+  @IsUrl()
   liveUrl?: string;
-
   @Field(() => [String])
-  @IsArray() @IsString({ each: true })
+  @IsArray()
+  @IsString({
+    each: true
+  })
   stack: string[];
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional() @IsInt()
+  @Field(() => Int, {
+    nullable: true
+  })
+  @IsOptional()
+  @IsInt()
   order?: number;
 }

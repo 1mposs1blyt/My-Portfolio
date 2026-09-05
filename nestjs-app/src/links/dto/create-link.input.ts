@@ -1,22 +1,23 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { LinkKind } from '../../generated/prisma/client.js';
-
 @InputType()
 export class CreateLinkInput {
   @Field(() => LinkKind)
   @IsEnum(LinkKind)
   kind: LinkKind;
-
   @Field()
-  @IsString() @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   label: string;
-
   @Field()
-  @IsString() @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   url: string;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional() @IsInt()
+  @Field(() => Int, {
+    nullable: true
+  })
+  @IsOptional()
+  @IsInt()
   order?: number;
 }
