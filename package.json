@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "@babel/generator": "^8.0.0",
+    "@babel/parser": "^8.0.4",
+    "prettier": "^3.9.6"
+  }
+}
