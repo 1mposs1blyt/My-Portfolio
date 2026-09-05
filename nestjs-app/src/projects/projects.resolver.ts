@@ -13,6 +13,8 @@ import { CreateProjectInput } from './dto/create-project.input.js';
 import { UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import { AdminGuard } from '../admin/admin.guard.js';
 import { UpdateProjectInput } from './dto/update-project.input.js';
+import { CreateProjectImageInput } from './dto/create-project-image.input.js';
+import { UpdateProjectImageInput } from './dto/update-project-image.input.js';
 
 @Resolver(() => ProjectType)
 export class ProjectsResolver {
@@ -49,5 +51,31 @@ export class ProjectsResolver {
   ) {
     await this.projectsService.remove(id);
     return true;
+  }
+  @Mutation(() => ProjectImageType, { name: 'addProjectImage' })
+  @UseGuards(AdminGuard)
+  async addProjectImage(@Args('input') input: CreateProjectImageInput) {
+    return this.projectsService.addImage(input);
+  }
+
+  @Mutation(() => ProjectImageType, { name: 'updateProjectImage' })
+  @UseGuards(AdminGuard)
+  async updateProjectImage(@Args('input') input: UpdateProjectImageInput) {
+    return this.projectsService.updateImage(input);
+  }
+
+  @Mutation(() => Boolean, { name: 'deleteProjectImage' })
+  @UseGuards(AdminGuard)
+  async deleteProjectImage(
+    @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
+  ) {
+    await this.projectsService.removeImage(id);
+    return true;
+  }
+
+  @Mutation(() => Boolean, { name: 'reorderProjectImages' })
+  @UseGuards(AdminGuard)
+  async reorderProjectImages(@Args('ids', { type: () => [ID] }) ids: string[]) {
+    return this.projectsService.reorderImages(ids);
   }
 }

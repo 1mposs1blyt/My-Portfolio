@@ -128,6 +128,10 @@ type Mutation {
   createProject(input: CreateProjectInput!): ProjectType!
   updateProject(input: UpdateProjectInput!): ProjectType!
   deleteProject(id: ID!): Boolean!
+  addProjectImage(input: CreateProjectImageInput!): ProjectImageType!
+  updateProjectImage(input: UpdateProjectImageInput!): ProjectImageType!
+  deleteProjectImage(id: ID!): Boolean!
+  reorderProjectImages(ids: [ID!]!): Boolean!
   createSkill(input: CreateSkillInput!): SkillType!
   updateSkill(input: UpdateSkillInput!): SkillType!
   deleteSkill(id: ID!): SkillType!
@@ -165,6 +169,18 @@ input UpdateProjectInput {
   stack: [String!]
   order: Int
   id: ID!
+}
+
+input CreateProjectImageInput {
+  projectId: ID!
+  url: String!
+  order: Int
+}
+
+input UpdateProjectImageInput {
+  id: ID!
+  url: String
+  order: Int
 }
 
 input CreateSkillInput {

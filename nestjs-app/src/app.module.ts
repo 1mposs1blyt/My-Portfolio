@@ -16,6 +16,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { ReviewsModule } from './reviews/reviews.module.js';
 import { LinksModule } from './links/links.module.js';
 import { ExperienceModule } from './experience/experience.module.js';
+import { UploadModule } from './upload/upload.module.js';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ExperienceModule } from './experience/experience.module.js';
     ReviewsModule,
     LinksModule,
     ExperienceModule,
+    UploadModule,
   ],
   providers: [],
 })
