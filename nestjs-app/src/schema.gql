@@ -87,15 +87,13 @@ type ProfileType {
   projects: [ProjectType!]!
 }
 
-type ReviewType {
+type ReviewTokenType {
   id: ID!
   type: ReviewKind!
-  authorName: String!
-  company: String
-  position: String
-  text: String!
-  rating: Int
   projectId: String
+  projectName: String
+  isUsed: Boolean!
+  expiresAt: DateTime!
   createdAt: DateTime!
 }
 
@@ -105,20 +103,12 @@ enum ReviewKind {
   EMPLOYER
 }
 
-type ReviewTokenValidType {
-  isValid: Boolean!
-  type: ReviewKind
-  projectId: String
-  projectName: String
-}
-
 type Query {
   profile: ProfileType
   projects: [ProjectType!]!
   skills: [SkillType!]!
   skill(id: ID!): SkillType
-  reviews: [ReviewType!]!
-  validateReviewToken(token: String!): ReviewTokenValidType!
+  reviewTokens: [ReviewTokenType!]!
   links: [ProfileLinkType!]!
   experience: [ExperienceType!]!
 }
@@ -135,7 +125,9 @@ type Mutation {
   createSkill(input: CreateSkillInput!): SkillType!
   updateSkill(input: UpdateSkillInput!): SkillType!
   deleteSkill(id: ID!): SkillType!
-  submitReview(input: CreateReviewInput!): ReviewType!
+  createReviewToken(input: CreateReviewTokenInput!): ReviewTokenType!
+  revokeReviewToken(id: ID!): Boolean!
+  deleteReview(id: ID!): Boolean!
   createLink(input: CreateLinkInput!): ProfileLinkType!
   updateLink(input: UpdateLinkInput!): ProfileLinkType!
   deleteLink(id: ID!): Boolean!
@@ -198,13 +190,10 @@ input UpdateSkillInput {
   id: ID!
 }
 
-input CreateReviewInput {
-  token: String!
-  authorName: String!
-  company: String
-  position: String
-  text: String!
-  rating: Int
+input CreateReviewTokenInput {
+  type: ReviewKind!
+  projectId: ID
+  days: Int
 }
 
 input CreateLinkInput {

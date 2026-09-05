@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service.js'; // Поправь путь к своему PrismaService
 import { CreateReviewInput } from './dto/create-review.input.js';
 import { ReviewKind } from './dto/reviews.type.js';
+import { CreateReviewTokenInput } from './dto/create-review-token.input.js';
 
 @Injectable()
 export class ReviewsService {
@@ -71,5 +72,54 @@ export class ReviewsService {
         data: reviewData,
       });
     });
+  }
+  private mapToken(t: any) {
+    return {
+      id: t.id,
+      type: t.type as ReviewKind,
+      projectId: t.projectId ?? undefined,
+      projectName: t.project?.name,
+      isUsed: t.isUsed,
+      expiresAt: t.expiresAt,
+      createdAt: t.createAt, // в схеме поле названо createAt
+    };
+  }
+
+  async createToken(input: CreateReviewTokenInput) {
+    if (input.type === ReviewKind.CLIENT && !input.projectId) {
+      throw new BadRequestException(
+        'Для отзыва заказчика нужно выбрать проект',
+      );
+    }
+
+    const days = input.days ?? 30;
+    const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+
+    const token = await this.prisma.reviewToken.create({
+      data: {
+        type: input.type,
+        projectId: input.type === ReviewKind.CLIENT ? input.projectId : null,
+        expiresAt,
+      },
+      include: { project: true },
+    });
+
+    return this.mapToken(token);
+  }
+
+  async findTokens() {
+    const list = await this.prisma.reviewToken.findMany({
+      orderBy: { createAt: 'desc' },
+      include: { project: true },
+    });
+    return list.map((t) => this.mapToken(t));
+  }
+
+  async revokeToken(id: string) {
+    await this.prisma.reviewToken.delete({ where: { id } });
+  }
+
+  async removeReview(id: string) {
+    await this.prisma.review.delete({ where: { id } });
   }
 }
