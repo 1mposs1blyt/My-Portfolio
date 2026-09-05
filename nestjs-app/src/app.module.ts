@@ -14,6 +14,8 @@ import { ProjectsModule } from './projects/projects.module.js';
 import { SkillsModule } from './skills/skills.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ReviewsModule } from './reviews/reviews.module.js';
+import { LinksModule } from './links/links.module.js';
+import { ExperienceModule } from './experience/experience.module.js';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { ReviewsModule } from './reviews/reviews.module.js';
     ProjectsModule,
     SkillsModule,
     ReviewsModule,
+    LinksModule,
+    ExperienceModule,
   ],
   providers: [],
 })

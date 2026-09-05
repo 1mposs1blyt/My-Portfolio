@@ -110,7 +110,8 @@ model Project {
   stack       String[]
   order       Int      @default(0)
 
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  updatedAt DateTime @default(now()) @updatedAt
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   images       ProjectImage[]
   reviewTokens ReviewToken[]
@@ -151,7 +152,7 @@ model Review {
   avatarUrl  String?
   text       String
   rating     Int?
-  projectId  String?     @db.Uuid
+  projectId  String?    @db.Uuid
   createdAt  DateTime   @default(now())
 
   project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)

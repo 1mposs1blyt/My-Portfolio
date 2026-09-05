@@ -3,6 +3,8 @@ import { SkillType } from './dto/skills.type.js';
 import { SkillsService } from './skills.service.js';
 import { CreateSkillInput } from './dto/create-skill.input.js';
 import { UpdateSkillInput } from './dto/update-skill.input.js';
+import { AdminGuard } from '../admin/admin.guard.js';
+import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator.js';
 
 @Resolver(() => SkillType)
 export class SkillsResolver {
@@ -25,8 +27,9 @@ export class SkillsResolver {
   }
   // UPDATE
   @Mutation(() => SkillType, { name: 'updateSkill' })
+  @UseGuards(AdminGuard)
   async updateSkill(@Args('input') input: UpdateSkillInput) {
-    return this.skillsService.update(input.id, input);
+    return this.skillsService.update(input);
   }
   // DELETE
   @Mutation(() => SkillType, { name: 'deleteSkill' })

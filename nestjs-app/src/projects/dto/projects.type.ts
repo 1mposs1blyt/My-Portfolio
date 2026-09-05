@@ -9,6 +9,7 @@ export class ProjectImageType {
 @ObjectType()
 export class ProjectType {
   @Field(() => ID) id: string;
+  @Field() url: string;
   @Field() name: string;
   @Field() description: string;
   @Field({ nullable: true }) repoUrl?: string;

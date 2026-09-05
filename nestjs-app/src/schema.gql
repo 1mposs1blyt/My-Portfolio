@@ -10,6 +10,7 @@ type ProjectImageType {
 
 type ProjectType {
   id: ID!
+  url: String!
   name: String!
   description: String!
   repoUrl: String
@@ -118,14 +119,33 @@ type Query {
   skill(id: ID!): SkillType
   reviews: [ReviewType!]!
   validateReviewToken(token: String!): ReviewTokenValidType!
+  links: [ProfileLinkType!]!
+  experience: [ExperienceType!]!
 }
 
 type Mutation {
+  updateProfile(input: UpdateProfileInput!): ProfileType!
   createProject(input: CreateProjectInput!): ProjectType!
+  updateProject(input: UpdateProjectInput!): ProjectType!
+  deleteProject(id: ID!): Boolean!
   createSkill(input: CreateSkillInput!): SkillType!
   updateSkill(input: UpdateSkillInput!): SkillType!
   deleteSkill(id: ID!): SkillType!
   submitReview(input: CreateReviewInput!): ReviewType!
+  createLink(input: CreateLinkInput!): ProfileLinkType!
+  updateLink(input: UpdateLinkInput!): ProfileLinkType!
+  deleteLink(id: ID!): Boolean!
+  createExperience(input: CreateExperienceInput!): ExperienceType!
+  updateExperience(input: UpdateExperienceInput!): ExperienceType!
+  deleteExperience(id: ID!): Boolean!
+}
+
+input UpdateProfileInput {
+  name: String
+  headline: String
+  description: String
+  location: String
+  email: String
 }
 
 input CreateProjectInput {
@@ -134,14 +154,24 @@ input CreateProjectInput {
   repoUrl: String
   liveUrl: String
   stack: [String!]!
-  order: Int!
+  order: Int
+}
+
+input UpdateProjectInput {
+  name: String
+  description: String
+  repoUrl: String
+  liveUrl: String
+  stack: [String!]
+  order: Int
+  id: ID!
 }
 
 input CreateSkillInput {
   name: String!
   category: SkillCategory!
-  level: Int!
-  order: Int!
+  level: Int
+  order: Int
 }
 
 input UpdateSkillInput {
@@ -159,4 +189,38 @@ input CreateReviewInput {
   position: String
   text: String!
   rating: Int
+}
+
+input CreateLinkInput {
+  kind: LinkKind!
+  label: String!
+  url: String!
+  order: Int
+}
+
+input UpdateLinkInput {
+  kind: LinkKind
+  label: String
+  url: String
+  order: Int
+  id: ID!
+}
+
+input CreateExperienceInput {
+  company: String!
+  position: String!
+  description: String
+  startDate: DateTime!
+  endDate: DateTime
+  achievements: [String!]
+}
+
+input UpdateExperienceInput {
+  company: String
+  position: String
+  description: String
+  startDate: DateTime
+  endDate: DateTime
+  achievements: [String!]
+  id: ID!
 }
