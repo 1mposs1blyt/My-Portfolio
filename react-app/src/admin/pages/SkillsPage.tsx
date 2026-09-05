@@ -9,6 +9,7 @@ import {
 } from "../api/api";
 import { useAdminToken } from "../hooks/useAdminToken";
 import { useConfirm } from "../ui/ConfirmProvider";
+import { DEMO_SKILLS } from "../demo/fixtures";
 
 type Skill = {
   id: string;
@@ -45,13 +46,17 @@ export default function SkillsPage() {
   const [draft, setDraft] = useState({ name: "", category: "LANGUAGE" });
 
   useEffect(() => {
-    if (!data?.profile?.skills || loaded) return;
-    const list: Skill[] = data.profile.skills;
+    if (loaded) return;
+    const list = isEditor ? data?.profile?.skills : DEMO_SKILLS;
+    if (!list) return;
     setRows(list);
-    setSnapshot(Object.fromEntries(list.map((s) => [s.id, s])));
+    setSnapshot(Object.fromEntries(list.map((s: any) => [s.id, s])));
     setLoaded(true);
-  }, [data, loaded]);
+  }, [data, loaded, isEditor]);
 
+  useEffect(() => {
+    setLoaded(false);
+  }, [isEditor]);
   const patch = (id: string, changes: Partial<Skill>) =>
     setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...changes } : r)));
 

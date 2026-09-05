@@ -11,9 +11,10 @@ import {
   UPDATE_PROJECT_MUTATION,
 } from "../api/api";
 import { useAdminToken, getAdminToken } from "../hooks/useAdminToken";
+import { DEMO_PROJECTS } from "../demo/fixtures";
 
 /** Базовый адрес API — отсюда же раздаются загруженные картинки */
-const API_ORIGIN = "http://192.168.1.62:3333";
+const API_ORIGIN = import.meta.env.VITE_BACKEND_URL;
 
 type ProjectImage = { id: string; url: string; order: number };
 
@@ -60,9 +61,11 @@ export default function ProjectsPage() {
   const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(() => {
-    if (!data?.profile?.projects || loaded) return;
+    if (loaded) return;
+    const source = isEditor ? data?.profile?.projects : DEMO_PROJECTS;
+    if (!source) return;
     setItems(
-      data.profile.projects.map((p: any) => ({
+      source.map((p: any) => ({
         ...p,
         repoUrl: p.repoUrl ?? "",
         liveUrl: p.liveUrl ?? "",
@@ -70,7 +73,11 @@ export default function ProjectsPage() {
       })),
     );
     setLoaded(true);
-  }, [data, loaded]);
+  }, [data, loaded, isEditor]);
+
+  useEffect(() => {
+    setLoaded(false);
+  }, [isEditor]);
 
   const say = (text: string) => {
     setStatus(text);

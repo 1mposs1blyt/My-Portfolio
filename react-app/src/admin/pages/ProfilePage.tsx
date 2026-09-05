@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useMutation, useQuery } from "urql";
 import { ADMIN_PROFILE_QUERY, UPDATE_PROFILE_MUTATION } from "../api/api.js";
 import { useAdminToken } from "../hooks/useAdminToken.js";
+import { DEMO_PROFILE } from "../demo/fixtures.js";
 
 type ProfileForm = {
   name: string;
@@ -35,8 +36,9 @@ export default function ProfilePage() {
 
   // заполняем форму один раз, когда приехали данные
   useEffect(() => {
-    if (!data?.profile || loaded) return;
-    const p = data.profile;
+    if (loaded) return;
+    const p = isEditor ? data?.profile : DEMO_PROFILE;
+    if (!p) return;
     setForm({
       name: p.name ?? "",
       headline: p.headline ?? "",
@@ -45,8 +47,12 @@ export default function ProfilePage() {
       email: p.email ?? "",
     });
     setLoaded(true);
-  }, [data, loaded]);
+  }, [data, loaded, isEditor]);
 
+  useEffect(() => {
+    setLoaded(false);
+  }, [isEditor]);
+  
   const field = (key: keyof ProfileForm) => ({
     value: form[key],
     onChange: (

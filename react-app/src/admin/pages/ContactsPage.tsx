@@ -8,6 +8,7 @@ import {
 } from "../api/api";
 import { useAdminToken } from "../hooks/useAdminToken";
 import { useConfirm } from "../ui/ConfirmProvider";
+import { DEMO_LINKS } from "../demo/fixtures";
 
 type Link = {
   id: string;
@@ -42,15 +43,18 @@ export default function ContactsPage() {
   const confirm = useConfirm();
 
   useEffect(() => {
-    if (!data?.profile?.links || loaded) return;
-    const list: Link[] = [...data.profile.links].sort(
-      (a, b) => a.order - b.order,
-    );
+    if (loaded) return;
+    const source = isEditor ? data?.profile?.links : DEMO_LINKS;
+    if (!source) return;
+    const list = [...source].sort((a, b) => a.order - b.order);
     setRows(list);
     setSnapshot(Object.fromEntries(list.map((l) => [l.id, l])));
     setLoaded(true);
-  }, [data, loaded]);
+  }, [data, loaded, isEditor]);
 
+  useEffect(() => {
+    setLoaded(false);
+  }, [isEditor]);
   const patch = (id: string, changes: Partial<Link>) =>
     setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...changes } : r)));
 

@@ -10,6 +10,7 @@ import {
   REVOKE_REVIEW_TOKEN_MUTATION,
 } from "../api/api";
 import { useAdminToken } from "../hooks/useAdminToken";
+import { DEMO_REVIEWS } from "../demo/fixtures";
 
 type Review = {
   id: string;
@@ -69,8 +70,8 @@ export default function ReviewsPage() {
   const [form, setForm] = useState({ type: "CLIENT", projectId: "", days: 30 });
 
   useEffect(() => {
-    if (reviewsData?.reviews) setReviews(reviewsData.reviews);
-  }, [reviewsData]);
+    setReviews(isEditor ? (reviewsData?.reviews ?? []) : DEMO_REVIEWS);
+  }, [reviewsData, isEditor]);
 
   useEffect(() => {
     if (tokensData?.reviewTokens) setTokens(tokensData.reviewTokens);

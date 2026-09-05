@@ -8,7 +8,7 @@ import "./index.css";
 const AdminApp = lazy(() => import("./admin/AdminApp"));
 
 const client = new Client({
-  url: "http://192.168.1.62:3333/graphql",
+  url: `${import.meta.env.VITE_BACKEND_URL}/graphql`,
   exchanges: [cacheExchange, fetchExchange],
   fetchOptions: () => {
     const token = getAdminToken();

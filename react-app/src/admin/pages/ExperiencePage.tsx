@@ -8,6 +8,7 @@ import {
   UPDATE_EXPERIENCE_MUTATION,
 } from "../api/api";
 import { useAdminToken } from "../hooks/useAdminToken";
+import { DEMO_EXPERIENCE } from "../demo/fixtures";
 
 type Achievement = { id?: string; text: string; order: number };
 
@@ -51,20 +52,24 @@ export default function ExperiencePage() {
   const [savingId, setSavingId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!data?.profile?.experience || loaded) return;
+    if (loaded) return;
+    const source = isEditor ? data?.profile?.experience : DEMO_EXPERIENCE;
+    if (!source) return;
     setItems(
-      data.profile.experience.map((e: any) => ({
+      source.map((e: any) => ({
         ...e,
         startDate: toDateInput(e.startDate),
         endDate: e.endDate ? toDateInput(e.endDate) : null,
         description: e.description ?? "",
-        achievements: [...(e.achievements ?? [])].sort(
-          (a, b) => a.order - b.order,
-        ),
+        achievements: [...(e.achievements ?? [])].sort((a, b) => a.order - b.order),
       })),
     );
     setLoaded(true);
-  }, [data, loaded]);
+  }, [data, loaded, isEditor]);
+
+  useEffect(() => {
+    setLoaded(false);
+  }, [isEditor]);
 
   const say = (text: string) => {
     setStatus(text);
