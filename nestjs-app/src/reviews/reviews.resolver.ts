@@ -1,15 +1,35 @@
 import { ID, Mutation, Args, Query, Resolver } from '@nestjs/graphql';
 import { ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { AdminGuard } from '../admin/admin.guard.js';
-import { ReviewTokenType } from './dto/review-token.type.js';
-import { CreateReviewTokenInput } from './dto/create-review-token.input.js';
 import { ReviewsService } from './reviews.service.js';
+import { ReviewType, ReviewTokenValidType } from './dto/reviews.type.js';
+import { ReviewTokenType } from './dto/review-token.type.js';
+import { CreateReviewInput } from './dto/create-review.input.js';
+import { CreateReviewTokenInput } from './dto/create-review-token.input.js';
 
 @Resolver()
 export class ReviewsResolver {
   constructor(private readonly reviewsService: ReviewsService) {}
 
-  // Получить все отзывы для портфолио
+  /* ── публичное ─────────────────────────────── */
+
+  @Query(() => [ReviewType], { name: 'reviews' })
+  async getReviews() {
+    return this.reviewsService.findAll();
+  }
+
+  @Query(() => ReviewTokenValidType, { name: 'validateReviewToken' })
+  async validateReviewToken(@Args('token') token: string) {
+    return this.reviewsService.validateToken(token);
+  }
+
+  @Mutation(() => ReviewType, { name: 'submitReview' })
+  async submitReview(@Args('input') input: CreateReviewInput) {
+    return this.reviewsService.createWithToken(input);
+  }
+
+  /* ── админское ─────────────────────────────── */
+
   @Query(() => [ReviewTokenType], { name: 'reviewTokens' })
   @UseGuards(AdminGuard)
   async getReviewTokens() {
