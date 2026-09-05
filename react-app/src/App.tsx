@@ -1,29 +1,54 @@
-import React, { useMemo } from "react";
+import React, { lazy, Suspense, useMemo } from "react";
 import { Client, Provider, cacheExchange, fetchExchange } from "urql";
 import PortfolioWorkspace from "./components/PortfolioWorkspace";
-import ReviewFormPage from "./components/ReviewFormPage"; // 💡 Импортируем форму
+import ReviewFormPage from "./components/ReviewFormPage";
+import { getAdminToken } from "./admin/hooks/useAdminToken";
 import "./index.css";
 
-// Инициализируем простой и понятный клиент URQL
+const AdminApp = lazy(() => import("./admin/AdminApp"));
+
 const client = new Client({
   url: "http://192.168.1.62:3333/graphql",
   exchanges: [cacheExchange, fetchExchange],
-  fetchOptions: {
-    headers: {
-      "apollo-require-preflight": "true",
-    },
+  fetchOptions: () => {
+    const token = getAdminToken();
+    return {
+      headers: {
+        "apollo-require-preflight": "true",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    };
   },
 });
 
 export default function App() {
+  const isAdmin = useMemo(
+    () =>
+      typeof window !== "undefined" &&
+      window.location.pathname.startsWith("/admin"),
+    [],
+  );
+
+  const isReview = useMemo(
+    () =>
+      typeof window !== "undefined" &&
+      (window.location.pathname.startsWith("/review") ||
+        new URLSearchParams(window.location.search).has("review")),
+    [],
+  );
+
   const reviewToken = useMemo(() => {
     if (typeof window === "undefined") return null;
-    const params = new URLSearchParams(window.location.search);
-    return params.get("review"); // Вернет UUID токена или null
+    return new URLSearchParams(window.location.search).get("review");
   }, []);
+
   return (
     <Provider value={client}>
-      {reviewToken ? (
+      {isAdmin ? (
+        <Suspense fallback={<div style={{ padding: 24 }}>Загрузка…</div>}>
+          <AdminApp />
+        </Suspense>
+      ) : isReview ? (
         <ReviewFormPage token={reviewToken} />
       ) : (
         <div className="app-container">

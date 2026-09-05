@@ -1,0 +1,504 @@
+:root {
+  --bg: #0a0810;
+  --panel: #14101f;
+  --panel2: #1a1428;
+  --line: #2a2140;
+  --text: #d3cde2;
+  --dim: #7e769a;
+  --violet: #8b5cf6;
+  --magenta: #ff3da6;
+}
+
+.adm-root {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.adm-root * {
+  box-sizing: border-box;
+}
+.adm-root ::selection {
+  background: var(--magenta);
+  color: var(--bg);
+}
+.adm-root a:focus-visible,
+.adm-root button:focus-visible,
+.adm-root input:focus-visible,
+.adm-root textarea:focus-visible,
+.adm-root select:focus-visible {
+  outline: 2px solid var(--magenta);
+  outline-offset: 2px;
+}
+
+/* баннер демо-режима */
+.adm-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  background: var(--violet);
+  color: #0a0810;
+  font-size: 12.5px;
+}
+.adm-banner a {
+  margin-left: auto;
+  color: #0a0810;
+  white-space: nowrap;
+}
+
+/* каркас */
+.adm-body {
+  display: flex;
+  align-items: flex-start;
+}
+.adm-side {
+  width: 220px;
+  flex: none;
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  padding: 20px 0;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+}
+.adm-side-title {
+  padding: 0 16px 16px;
+  border-bottom: 1px solid var(--line);
+  color: #f4f1fa;
+  font-weight: 600;
+}
+.adm-nav {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+}
+.adm-nav button {
+  font: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+  border-left: 2px solid transparent;
+  color: var(--dim);
+  padding: 7px 10px;
+  cursor: pointer;
+}
+.adm-nav button:hover {
+  color: var(--text);
+}
+.adm-nav button[data-on="true"] {
+  background: var(--panel2);
+  border-left-color: var(--magenta);
+  color: #f4f1fa;
+}
+
+/* ввод токена */
+.adm-token {
+  padding: 14px 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.adm-token label {
+  font-size: 11.5px;
+  color: var(--dim);
+}
+.adm-token input {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 5px 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+.adm-token-on {
+  font-size: 11.5px;
+  color: var(--magenta);
+}
+.adm-btn {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 5px 10px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  cursor: pointer;
+}
+.adm-btn:hover:not(:disabled) {
+  border-color: var(--violet);
+  color: #f4f1fa;
+}
+.adm-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.adm-btn-main {
+  background: var(--violet);
+  border-color: var(--violet);
+  color: #0a0810;
+  font-weight: 500;
+}
+.adm-btn-main:hover:not(:disabled) {
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: #0a0810;
+}
+.adm-back {
+  padding: 12px 16px 0;
+  color: var(--dim);
+  text-decoration: none;
+  font-size: 12.5px;
+}
+.adm-back:hover {
+  color: var(--text);
+}
+
+/* контент */
+.adm-main {
+  flex: 1;
+  min-width: 0;
+  padding: 28px 32px 80px;
+}
+.adm-page {
+  max-width: 720px;
+}
+.adm-h1 {
+  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #f4f1fa;
+}
+.adm-hint {
+  color: var(--dim);
+}
+
+/* поля форм — пригодятся на всех экранах */
+.adm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+.adm-field label {
+  font-size: 12px;
+  color: var(--dim);
+}
+.adm-field input,
+.adm-field textarea,
+.adm-field select {
+  font: inherit;
+  padding: 8px 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+.adm-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+.adm-error {
+  font-size: 12px;
+  color: var(--magenta);
+}
+.adm-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+@media (max-width: 800px) {
+  .adm-body {
+    flex-direction: column;
+  }
+  .adm-side {
+    width: 100%;
+    min-height: 0;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .adm-nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .adm-nav button {
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+  .adm-nav button[data-on="true"] {
+    border-left: none;
+    border-bottom-color: var(--magenta);
+  }
+  .adm-main {
+    padding: 20px 16px 60px;
+  }
+}
+.adm-page-wide {
+  max-width: 900px;
+}
+.adm-count {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--dim);
+}
+
+.adm-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.adm-table th {
+  text-align: left;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--dim);
+  padding: 0 8px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.adm-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.adm-table td:first-child {
+  width: 40%;
+}
+.adm-td-right {
+  text-align: right;
+}
+.adm-table input,
+.adm-table select {
+  font: inherit;
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--panel);
+  border: 1px solid transparent;
+  color: var(--text);
+}
+.adm-table input:hover,
+.adm-table select:hover {
+  border-color: var(--line);
+}
+.adm-table input:focus,
+.adm-table select:focus {
+  border-color: var(--violet);
+  outline: none;
+}
+
+.adm-level {
+  display: flex;
+  gap: 3px;
+}
+.adm-level button {
+  width: 18px;
+  height: 10px;
+  padding: 0;
+  cursor: pointer;
+  background: var(--line);
+  border: none;
+}
+.adm-level button[data-on="true"] {
+  background: var(--violet);
+}
+.adm-level button:hover {
+  background: var(--magenta);
+}
+
+.adm-del {
+  font: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--dim);
+  padding: 4px 8px;
+}
+.adm-del:hover {
+  color: var(--magenta);
+}
+.adm-row-new td {
+  background: rgba(139, 92, 246, 0.05);
+}
+.adm-th-num {
+  width: 60px;
+}
+.adm-num {
+  width: 60px;
+  text-align: center;
+}
+.adm-card {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.adm-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+@media (max-width: 700px) {
+  .adm-grid2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adm-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--dim);
+  margin-top: 4px;
+}
+.adm-check input {
+  width: auto;
+}
+
+.adm-ach-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.adm-ach-row input {
+  flex: 1;
+}
+
+.adm-icon {
+  font: inherit;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.adm-icon:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.adm-btn-small {
+  font-size: 12px;
+  padding: 4px 10px;
+  align-self: flex-start;
+}
+
+.adm-shots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.adm-shot {
+  margin: 0;
+  width: 160px;
+  border: 1px solid var(--line);
+}
+.adm-shot img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+}
+.adm-shot figcaption {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: var(--panel2);
+}
+
+.adm-h2 {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #f4f1fa;
+}
+.adm-link-box {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.adm-link-box input {
+  flex: 1;
+  font: inherit;
+  font-size: 12.5px;
+  padding: 6px 8px;
+  background: var(--bg);
+  border: 1px solid var(--violet);
+  color: var(--text);
+}
+.adm-review {
+  border-top: 1px solid var(--line);
+  padding: 12px 0;
+}
+.adm-review:first-of-type {
+  border-top: none;
+}
+.adm-review header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.adm-review header strong {
+  color: #f4f1fa;
+}
+.adm-review-meta {
+  margin-left: auto;
+}
+.adm-review p {
+  margin: 6px 0 0;
+}
+.adm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 4, 10, 0.85);
+  padding: 20px;
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.adm-modal-box {
+  width: 100%;
+  max-width: 420px;
+  padding: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.adm-modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #f4f1fa;
+}
+.adm-modal-text {
+  margin: 10px 0 0;
+  color: var(--dim);
+  font-size: 13px;
+}
+.adm-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+.adm-btn-danger {
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: #0a0810;
+  font-weight: 500;
+}
+.adm-btn-danger:hover:not(:disabled) {
+  background: #ff5cb5;
+  border-color: #ff5cb5;
+}

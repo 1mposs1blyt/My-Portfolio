@@ -1,18 +1,6 @@
-// src/components/Sidebar.tsx
 import React from "react";
 import { LangType } from "../types/portfolio";
 
-/**
- * Sidebar больше не знает ни про profile, ни про getLocalization.
- * Единственный источник правды — PortfolioWorkspace: он считает t по живым
- * данным из usePortfolioData и передаёт сюда готовым.
- *
- * В types/portfolio.ts у SidebarProps надо добавить:
- *   t: Localization;        // тот же тип, что возвращает getLocalization(...)[lang]
- *   name: string;
- *   headline: string;
- *   available?: string[];   // id секций, реально отрисованных на странице
- */
 type SidebarProps = {
   lang: LangType;
   setLang: (lang: LangType) => void;
@@ -34,8 +22,6 @@ export default function Sidebar({
   headline,
   available,
 }: SidebarProps) {
-  // Если родитель сказал, какие секции есть в DOM, — прячем пункты без секции,
-  // чтобы по ним нельзя было кликнуть в пустоту. Без available показываем всё.
   const items = available
     ? t.tree.filter((n: any) => available.includes(n.id))
     : t.tree;
@@ -79,6 +65,12 @@ export default function Sidebar({
             en
           </button>
         </div>
+        <a className="b-admin-link" href="/review">
+          отзыв
+        </a>
+        <a className="b-admin-link" href="/admin">
+          admin
+        </a>
       </div>
     </aside>
   );
