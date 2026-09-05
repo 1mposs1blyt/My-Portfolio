@@ -29,5 +29,16 @@ export const GET_PORTFOLIO_DATA = gql`
         images { url order } 
       }
     }
+    
+    reviews {
+      id
+      type
+      authorName
+      company
+      position
+      text
+      rating
+      projectId
+    }
   }
 `;

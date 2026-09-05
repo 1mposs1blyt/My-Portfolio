@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Client, Provider, cacheExchange, fetchExchange } from "urql";
 import PortfolioWorkspace from "./components/PortfolioWorkspace";
+import ReviewFormPage from "./components/ReviewFormPage"; // 💡 Импортируем форму
 import "./index.css";
 
 // Инициализируем простой и понятный клиент URQL
@@ -15,12 +16,20 @@ const client = new Client({
 });
 
 export default function App() {
+  const reviewToken = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    const params = new URLSearchParams(window.location.search);
+    return params.get("review"); // Вернет UUID токена или null
+  }, []);
   return (
-    /* 💡 Оборачиваем в Provider от urql и передаем созданный клиент */
     <Provider value={client}>
-      <div className="app-container">
-        <PortfolioWorkspace />
-      </div>
+      {reviewToken ? (
+        <ReviewFormPage token={reviewToken} />
+      ) : (
+        <div className="app-container">
+          <PortfolioWorkspace />
+        </div>
+      )}
     </Provider>
   );
 }

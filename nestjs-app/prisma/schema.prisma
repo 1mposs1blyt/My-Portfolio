@@ -16,6 +16,11 @@ enum LinkKind {
   WEBSITE
 }
 
+enum ReviewType {
+  CLIENT
+  EMPLOYER
+}
+
 enum SkillCategory {
   LANGUAGE
   BACKEND
@@ -107,7 +112,9 @@ model Project {
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
-  images ProjectImage[]
+  images       ProjectImage[]
+  reviewTokens ReviewToken[]
+  reviews      Review[]
 
   @@unique([profileId, name])
   @@index([profileId])
@@ -122,4 +129,30 @@ model ProjectImage {
 
   @@index([projectId])
   @@map("project_images")
+}
+
+model ReviewToken {
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type      ReviewType
+  projectId String?    @db.Uuid
+  isUsed    Boolean    @default(false)
+  expiresAt DateTime   @default(now())
+  createAt  DateTime   @default(now())
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type       ReviewType
+  authorName String
+  company    String?
+  position   String?
+  avatarUrl  String?
+  text       String
+  rating     Int?
+  projectId  String?     @db.Uuid
+  createdAt  DateTime   @default(now())
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }

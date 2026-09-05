@@ -1,10 +1,18 @@
 // src/data/localization.ts
 
-export const getLocalization = (projectsCount: number, userName: string, userHeadline: string) => ({
+import { plural } from "../lib/plural";
+
+export const getLocalization = (
+  projectsCount: number,
+  userName: string,
+  userHeadline: string,
+  reviewsCount: number = 0, // 💡 Добавили четвертый аргумент для отзывов
+) => ({
   ru: {
     tree: [
       { id: "about", file: "about.md" },
       { id: "projects", file: "projects/", count: projectsCount },
+      { id: "reviews", file: "reviews.log", count: reviewsCount }, // 🚀 Появится в сайдбаре на русском
       { id: "skills", file: "skills.json" },
       { id: "experience", file: "experience.log" },
       { id: "contacts", file: "contacts.ts" },
@@ -12,7 +20,12 @@ export const getLocalization = (projectsCount: number, userName: string, userHea
     script: [
       { cmd: "npm run dev", out: ["ready — портфолио запущено на :3000"] },
       { cmd: "whoami", out: [`${userName} — ${userHeadline.toLowerCase()}`] },
-      { cmd: "open projects/", out: [`${projectsCount} проектов`] },
+      {
+        cmd: "open projects/",
+        out: [
+          `${plural(projectsCount, { one: "проект", few: "проекта", many: "проектов" }, "ru")}`,
+        ],
+      },
     ],
     headings: {
       about: "Коротко о себе",
@@ -20,6 +33,8 @@ export const getLocalization = (projectsCount: number, userName: string, userHea
       skills: "Стек",
       experience: "Опыт",
       contacts: "Контакты",
+      reviews: "Отзывы заказчиков",
+      recommendations: "Рекомендации работодателей",
     },
     categories: {
       LANGUAGE: "Языки",
@@ -29,11 +44,18 @@ export const getLocalization = (projectsCount: number, userName: string, userHea
       INFRA: "Инфраструктура",
       TOOL: "Инструменты",
     },
-    kinds: { GITHUB: "GitHub", LINKEDIN: "LinkedIn", TELEGRAM: "Telegram", EMAIL: "Почта", WEBSITE: "Сайт" },
+    kinds: {
+      GITHUB: "GitHub",
+      LINKEDIN: "LinkedIn",
+      TELEGRAM: "Telegram",
+      EMAIL: "Почта",
+      WEBSITE: "Сайт",
+    },
     demo: "Открыть демо",
     repo: "Смотреть код",
     gallery: "Скриншоты",
-    shots: (n: number) => (n === 1 ? "1 скриншот" : n < 5 ? n + " скриншота" : n + " скриншотов"),
+    shots: (n: number) =>
+      n === 1 ? "1 скриншот" : n < 5 ? n + " скриншота" : n + " скриншотов",
     noShots: "без скриншотов",
     close: "Закрыть",
     prev: "Предыдущий",
@@ -41,12 +63,26 @@ export const getLocalization = (projectsCount: number, userName: string, userHea
     present: "сейчас",
     hire: "Открыт к предложениям",
     footer: "Контент страницы приходит из базы.",
-    months: ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"],
+    months: [
+      "янв",
+      "фев",
+      "мар",
+      "апр",
+      "мая",
+      "июн",
+      "июл",
+      "авг",
+      "сен",
+      "окт",
+      "ноя",
+      "дек",
+    ],
   },
   en: {
     tree: [
       { id: "about", file: "about.md" },
       { id: "projects", file: "projects/", count: projectsCount },
+      { id: "reviews", file: "reviews.log", count: reviewsCount }, // 🚀 Появится в сайдбаре на английском
       { id: "skills", file: "skills.json" },
       { id: "experience", file: "experience.log" },
       { id: "contacts", file: "contacts.ts" },
@@ -62,6 +98,8 @@ export const getLocalization = (projectsCount: number, userName: string, userHea
       skills: "Stack",
       experience: "Experience",
       contacts: "Contacts",
+      reviews: "Client Reviews",
+      recommendations: "Employer Recommendations",
     },
     categories: {
       LANGUAGE: "Languages",
@@ -71,7 +109,13 @@ export const getLocalization = (projectsCount: number, userName: string, userHea
       INFRA: "Infrastructure",
       TOOL: "Tools",
     },
-    kinds: { GITHUB: "GitHub", LINKEDIN: "LinkedIn", TELEGRAM: "Telegram", EMAIL: "Email", WEBSITE: "Website" },
+    kinds: {
+      GITHUB: "GitHub",
+      LINKEDIN: "LinkedIn",
+      TELEGRAM: "Telegram",
+      EMAIL: "Email",
+      WEBSITE: "Website",
+    },
     demo: "Open demo",
     repo: "View code",
     gallery: "Screenshots",
@@ -83,6 +127,19 @@ export const getLocalization = (projectsCount: number, userName: string, userHea
     present: "now",
     hire: "Open to offers",
     footer: "Page content comes from the database.",
-    months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    months: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
   },
 });

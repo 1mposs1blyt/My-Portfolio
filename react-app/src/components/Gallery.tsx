@@ -45,7 +45,7 @@ export default function Gallery({ project, t, onClose }: GalleryProps) {
 
   // 💡 Определяем тип текущей картинки для главного экрана
   const currentImageUrl = images[i]?.url || "";
-  
+
   // 💡 Поправили префикс: теперь проверка точно находит сгенерированный SVG
   const isMainGeneratedSvg = currentImageUrl.startsWith("data:image/svg+xml,");
   const mainSvgContent = isMainGeneratedSvg
@@ -54,7 +54,8 @@ export default function Gallery({ project, t, onClose }: GalleryProps) {
 
   // 💡 Страховка: если Vite не прочитал .env, мы принудительно заменяем пустую строку на твой рабочий порт 3333
   const rawEnvUrl = import.meta.env.VITE_BACKEND_URL;
-  const backendUrl = rawEnvUrl && rawEnvUrl.trim() !== "" ? rawEnvUrl : "http://localhost:3333";
+  const backendUrl =
+    rawEnvUrl && rawEnvUrl.trim() !== "" ? rawEnvUrl : "http://localhost:3333";
 
   // 💡 Бронебойная склейка: ищет public в любом виде (со слэшем или без) и склеивает с бэкендом
   const fullCoverUrl = currentImageUrl.includes("public")
@@ -124,7 +125,9 @@ export default function Gallery({ project, t, onClose }: GalleryProps) {
           <div className="b-thumbs">
             {images.map((img, k) => {
               // 💡 Поправили префикс для миниатюр
-              const isThumbGenerated = img.url.startsWith("data:image/svg+xml,");
+              const isThumbGenerated = img.url.startsWith(
+                "data:image/svg+xml,",
+              );
               const thumbSvgContent = isThumbGenerated
                 ? decodeURIComponent(img.url.replace("data:image/svg+xml,", ""))
                 : "";
@@ -153,6 +156,61 @@ export default function Gallery({ project, t, onClose }: GalleryProps) {
                 </button>
               );
             })}
+          </div>
+        )}
+
+        {/* 💡 ДОБАВЛЕНО: Контекстные отзывы заказчиков к конкретному проекту */}
+        {project.reviews && project.reviews.length > 0 && (
+          <div
+            className="b-project-reviews"
+            style={{
+              padding: "1.25rem",
+              borderTop: "1px solid #2A2140",
+              background: "#161124",
+            }}
+          >
+            <h4
+              style={{
+                margin: "0 0 1rem 0",
+                color: "#FF3DA6",
+                fontSize: "1.1rem",
+              }}
+            >
+              {t.headings?.reviews || "Отзывы заказчиков"}
+            </h4>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              {project.reviews.map((rev: any) => (
+                <blockquote
+                  key={rev.id}
+                  style={{
+                    margin: 0,
+                    paddingLeft: "1rem",
+                    borderLeft: "3px solid #8B5CF6",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: "0 0 0.5rem 0",
+                      fontStyle: "italic",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    “{rev.text}”
+                  </p>
+                  <cite
+                    style={{
+                      fontSize: "0.85rem",
+                      color: "#7E769A",
+                      fontStyle: "normal",
+                    }}
+                  >
+                    — {rev.authorName} {rev.company ? `(${rev.company})` : ""}
+                  </cite>
+                </blockquote>
+              ))}
+            </div>
           </div>
         )}
 

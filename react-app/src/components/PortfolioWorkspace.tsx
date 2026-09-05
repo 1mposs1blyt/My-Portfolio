@@ -1,5 +1,11 @@
 // src/components/PortfolioWorkspace.tsx
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import { LangType, Project } from "../types/portfolio";
 import { getLocalization } from "../data/localization";
 import { usePortfolioData } from "../hooks/usePortfolioData";
@@ -13,6 +19,7 @@ import ProjectsSection from "./sections/ProjectsSection";
 import SkillsSection from "./sections/SkillsSection";
 import ExperienceSection from "./sections/ExperienceSection";
 import ContactsSection from "./sections/ContactsSection";
+import ReviewsSection from "./sections/ReviewsSection";
 
 const CATEGORY_ORDER = [
   "LANGUAGE",
@@ -26,28 +33,46 @@ const CATEGORY_ORDER = [
 export default function PortfolioWorkspace() {
   const [lang, setLang] = useState<LangType>("ru");
   const [active, setActive] = useState("about");
+  const [available, setAvailable] = useState<string[]>([]);
   const [open, setOpen] = useState<Project | null>(null);
   const scope = useRef<HTMLDivElement>(null);
 
-  // 🚀 Запрашиваем данные (больше не блокируем рендер компонента)
-  const { loading, error, profile } = usePortfolioData();
+  const { loading, error, profile, reviews } = usePortfolioData();
 
-  // 💡 Локализация теперь ВСЕГДА имеет дефолтные значения (защита от пустой БД или загрузки)
   const t = useMemo(() => {
     const projectsCount = profile?.projects?.length || 0;
-    const name = profile?.name || "Александр"; 
+    const reviewsCount = reviews?.length || 0;
+    const name = profile?.name || "Александр";
     const headline = profile?.headline || "Разработчик";
-    return getLocalization(projectsCount, name, headline)[lang];
-  }, [lang, profile]);
+    return getLocalization(projectsCount, name, headline, reviewsCount)[lang];
+  }, [lang, profile, reviews]);
 
-  // Мемоизация упорядоченных данных (безопасно возвращают пустые массивы при загрузке)
-  const projects = useMemo(
-    () => profile?.projects ? [...profile.projects].sort((a, b) => a.order - b.order) : [],
-    [profile?.projects],
-  );
+  const projects = useMemo(() => {
+    if (!profile?.projects) return [];
+    return [...profile.projects]
+      .sort((a, b) => a.order - b.order)
+      .map((project) => ({
+        ...project,
+        reviews: (reviews || []).filter(
+          (r: any) => r.type === "CLIENT" && r.projectId === project.id,
+        ),
+      }));
+  }, [profile?.projects, reviews]);
+
+  const allReviews = useMemo(() => {
+    if (!reviews) return [];
+    return [...reviews].sort((a: any, b: any) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [reviews]);
 
   const links = useMemo(
-    () => profile?.links ? [...profile.links].sort((a, b) => a.order - b.order) : [],
+    () =>
+      profile?.links
+        ? [...profile.links].sort((a, b) => a.order - b.order)
+        : [],
     [profile?.links],
   );
 
@@ -65,70 +90,118 @@ export default function PortfolioWorkspace() {
   }, [profile?.skills]);
 
   const experience = useMemo(
-    () => profile?.experience ? [...profile.experience].sort((a, b) => {
+    () =>
+      profile?.experience
+        ? [...profile.experience].sort((a, b) => {
             const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
             const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
             return dateB - dateA;
-          }) : [],
+          })
+        : [],
     [profile?.experience],
   );
 
-  // Следим за тем, какая секция сейчас на экране
-  useEffect(() => {
+  /**
+   * Скролл-трекер.
+   *
+   * Было: querySelectorAll один раз в useEffect с [], пока данные ещё грузились.
+   * Секции, которые появлялись после ответа бэка (например, отзывы), в этот
+   * снимок не попадали — подсветка по ним не работала.
+   *
+   * Стало: список секций читается заново на каждом расчёте, а сам эффект
+   * переподписывается при изменении данных. Плюс MutationObserver ловит случай,
+   * когда секция появилась или исчезла без смены этих зависимостей.
+   */
+  const recalc = useCallback(() => {
     const root = scope.current;
-    if (!root || typeof IntersectionObserver === "undefined") return;
-    const sections = Array.from(root.querySelectorAll("[data-section]"));
-    const io = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+    if (!root) return;
 
-        const topVisible = visibleEntries[0];
-        if (topVisible) {
-          setActive(topVisible.target.getAttribute("data-section") || "about");
-        }
-      },
-      { rootMargin: "-20% 0px -60% 0px", threshold: [0.1, 0.5] },
+    const sections = Array.from(root.querySelectorAll("[data-section]"));
+    if (sections.length === 0) return;
+
+    const ids = sections.map((s) => s.getAttribute("data-section") || "");
+    setAvailable((prev) =>
+      prev.length === ids.length && prev.every((v, i) => v === ids[i])
+        ? prev
+        : ids,
     );
-    sections.forEach((s) => io.observe(s));
-    return () => io.disconnect();
+
+    const atBottom =
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - 50;
+    if (atBottom) {
+      setActive(ids[ids.length - 1]);
+      return;
+    }
+
+    const triggerLine = window.innerHeight * 0.25;
+    let current = ids[0];
+    sections.forEach((section, i) => {
+      if (section.getBoundingClientRect().top <= triggerLine) current = ids[i];
+    });
+    setActive(current);
   }, []);
 
+  useEffect(() => {
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        recalc();
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+
+    const root = scope.current;
+    const mo = root ? new MutationObserver(onScroll) : null;
+    mo?.observe(root!, { childList: true, subtree: true });
+
+    recalc();
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      mo?.disconnect();
+    };
+  }, [recalc, loading, projects, allReviews, skills, experience, links]);
+
   const handleNavigate = (id: string) => {
-    scope.current
-      ?.querySelector(`[data-section="${id}"]`)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const el = scope.current?.querySelector(`[data-section="${id}"]`);
+    if (!el) return; // секции ещё нет в DOM — молчим вместо мёртвого клика
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActive(id); // мгновенная подсветка, не дожидаясь конца плавного скролла
   };
 
   return (
     <div className="b-root" ref={scope}>
-      {/* 💡 Сайдбар рендерится СРАЗУ, переключалка языков доступна мгновенно */}
       <Sidebar
         lang={lang}
         setLang={setLang}
         active={active}
         onNavigate={handleNavigate}
+        t={t}
+        name={profile?.name || "Александр"}
+        headline={profile?.headline || "Разработчик"}
+        available={available}
       />
 
       <main className="b-main">
-        {/* Терминал запускается сразу при старте страницы */}
-        <TerminalPane lang={lang} />
-        
-        {/* Контентные секции плавно рендарят пустые состояния или скелетоны, если данных еще нет */}
+        <TerminalPane lang={lang} t={t} />
+
         <AboutSection t={t} />
-        
-        {/* Если база данных легла, внутри секции можно будет вывести красивый варн */}
         <ProjectsSection t={t} projects={projects} onOpenGallery={setOpen} />
-        
+        <ReviewsSection t={t} reviews={allReviews} />
         <SkillsSection t={t} skills={skills} />
-        
         <ExperienceSection t={t} experience={experience} />
-        
         <ContactsSection t={t} links={links} />
 
-        {/* Локальное уведомление об ошибке b-node, не ломающее весь сайт */}
-        {error && <div className="b-error-toast">Связь с NestJS потеряна: {error}</div>}
+        {error && (
+          <div className="b-error-toast">Связь с NestJS потеряна: {error}</div>
+        )}
       </main>
 
       {open && <Gallery project={open} t={t} onClose={() => setOpen(null)} />}

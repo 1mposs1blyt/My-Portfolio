@@ -86,11 +86,38 @@ type ProfileType {
   projects: [ProjectType!]!
 }
 
+type ReviewType {
+  id: ID!
+  type: ReviewKind!
+  authorName: String!
+  company: String
+  position: String
+  text: String!
+  rating: Int
+  projectId: String
+  createdAt: DateTime!
+}
+
+"""Тип отзыва: CLIENT - заказчик проекта, EMPLOYER - работодатель"""
+enum ReviewKind {
+  CLIENT
+  EMPLOYER
+}
+
+type ReviewTokenValidType {
+  isValid: Boolean!
+  type: ReviewKind
+  projectId: String
+  projectName: String
+}
+
 type Query {
   profile: ProfileType
   projects: [ProjectType!]!
   skills: [SkillType!]!
   skill(id: ID!): SkillType
+  reviews: [ReviewType!]!
+  validateReviewToken(token: String!): ReviewTokenValidType!
 }
 
 type Mutation {
@@ -98,6 +125,7 @@ type Mutation {
   createSkill(input: CreateSkillInput!): SkillType!
   updateSkill(input: UpdateSkillInput!): SkillType!
   deleteSkill(id: ID!): SkillType!
+  submitReview(input: CreateReviewInput!): ReviewType!
 }
 
 input CreateProjectInput {
@@ -122,4 +150,13 @@ input UpdateSkillInput {
   level: Int
   order: Int
   id: ID!
+}
+
+input CreateReviewInput {
+  token: String!
+  authorName: String!
+  company: String
+  position: String
+  text: String!
+  rating: Int
 }

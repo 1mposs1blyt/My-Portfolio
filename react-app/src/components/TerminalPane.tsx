@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { LangType } from "../types/portfolio";
-import { profile } from "../data/profile"; // 💡 Добавили импорт профиля
-import { getLocalization } from "../data/localization"; // 💡 Импортируем функцию вместо copy
-import { useReducedMotion } from "../hooks/useReducedMotion"
+import React, { useState, useEffect } from "react";
+import { LangType, Localization } from "../types/portfolio";
+import { useReducedMotion } from "../hooks/useReducedMotion";
 
-export default function TerminalPane({ lang }: { lang: LangType }) {
+type TerminalPaneProps = {
+  lang: LangType;
+  t: Localization;
+};
+
+export default function TerminalPane({ lang, t }: TerminalPaneProps) {
   const reduced = useReducedMotion();
-  
-  // 💡 Динамически вытаскиваем скрипт терминала для текущего языка
-  const script = useMemo(() => {
-    return getLocalization(profile.projects.length, profile.name, profile.headline)[lang].script;
-  }, [lang]);
+  const script = t.script;
 
   const [line, setLine] = useState(0);
   const [chars, setChars] = useState(0);
@@ -35,14 +34,17 @@ export default function TerminalPane({ lang }: { lang: LangType }) {
     }
     const cmd = script[line].cmd;
     if (chars < cmd.length) {
-      const t = setTimeout(() => setChars((c) => c + 1), 32 + Math.random() * 45);
-      return () => clearTimeout(t);
+      const timer = setTimeout(
+        () => setChars((c) => c + 1),
+        32 + Math.random() * 45,
+      );
+      return () => clearTimeout(timer);
     }
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       setLine((l) => l + 1);
       setChars(0);
     }, 430);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [line, chars, finished, reduced, script]);
 
   return (

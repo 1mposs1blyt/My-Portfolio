@@ -13,6 +13,7 @@ import { ProfileModule } from './profile/profile.module.js';
 import { ProjectsModule } from './projects/projects.module.js';
 import { SkillsModule } from './skills/skills.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ReviewsModule } from './reviews/reviews.module.js';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     ProfileModule,
     ProjectsModule,
     SkillsModule,
+    ReviewsModule,
   ],
   providers: [],
 })
