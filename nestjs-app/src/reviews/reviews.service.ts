@@ -81,7 +81,7 @@ export class ReviewsService {
       projectName: t.project?.name,
       isUsed: t.isUsed,
       expiresAt: t.expiresAt,
-      createdAt: t.createAt, // в схеме поле названо createAt
+      createdAt: t.createdAt,
     };
   }
 
@@ -109,7 +109,7 @@ export class ReviewsService {
 
   async findTokens() {
     const list = await this.prisma.reviewToken.findMany({
-      orderBy: { createAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
       include: { project: true },
     });
     return list.map((t) => this.mapToken(t));
