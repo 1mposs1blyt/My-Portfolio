@@ -664,7 +664,7 @@ html {
 }
 
 @media (max-width: 860px) {
-  .b-btn {
+  .b-root {
     flex-direction: column;
   }
   .b-side {
