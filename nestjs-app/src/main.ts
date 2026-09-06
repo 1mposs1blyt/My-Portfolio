@@ -8,8 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors({
     origin: process.env.NODE_ENV === 'production'
-      ? ['https://твой-домен.ru']
-      : ['http://localhost:5173', 'http://localhost:4173', 'http://192.168.1.62:5173'],
+      ? ['https://1mposs1blyt.duckdns.org']
+      : ['http://localhost:5173', 'http://localhost:4173'],
     credentials: true
   });
   app.useGlobalPipes(new ValidationPipe({
