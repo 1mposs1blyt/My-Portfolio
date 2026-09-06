@@ -61,5 +61,6 @@ dist/
 tsconfig.build.tsbuildinfo
 
 # db backups
-backup*.sql
-backup-****-**-**.sql
+*.sql
+backup-*.sql
+
