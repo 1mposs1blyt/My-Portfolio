@@ -3,7 +3,7 @@ FROM dockerhub.timeweb.cloud/library/node:22-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
 RUN npx prisma generate && npm run build
