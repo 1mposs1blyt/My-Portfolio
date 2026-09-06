@@ -14,30 +14,33 @@ export class ReviewsService {
     });
   }
   async validateToken(tokenId: string) {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
     if (!uuidRegex.test(tokenId)) {
-      return {
-        isValid: false
-      };
+      return { isValid: false };
     }
+
     const token = await this.prisma.reviewToken.findUnique({
-      where: {
-        id: tokenId
-      },
-      include: {
-        project: true
-      }
+      where: { id: tokenId },
+      include: { project: true },
     });
-    if (!token || token.isUsed || token.expiresAt < new Date()) {
-      return {
-        isValid: false
-      };
+
+    if (!token) {
+      return { isValid: false };
     }
+    if (token.isUsed) {
+      return { isValid: false };
+    }
+    if (token.expiresAt < new Date()) {
+      return { isValid: false };
+    }
+
     return {
       isValid: true,
       type: token.type as ReviewKind,
       projectId: token.projectId,
-      projectName: token.project?.name
+      projectName: token.project?.name,
     };
   }
   async createWithToken(input: CreateReviewInput) {

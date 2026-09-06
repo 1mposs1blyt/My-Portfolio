@@ -8,18 +8,15 @@ import { CreateReviewInput } from './dto/create-review.input.js';
 import { CreateReviewTokenInput } from './dto/create-review-token.input.js';
 @Resolver()
 export class ReviewsResolver {
-  constructor(private readonly reviewsService: ReviewsService) {}
+  constructor(private readonly reviewsService: ReviewsService) { }
   @Query(() => [ReviewType], {
     name: 'reviews'
   })
   async getReviews() {
     return this.reviewsService.findAll();
   }
-  @Query(() => ReviewTokenValidType, {
-    name: 'validateReviewToken'
-  })
-  async validateReviewToken(@Args('token')
-  token: string) {
+  @Query(() => ReviewTokenValidType, { name: 'validateReviewToken' })
+  async validateReviewToken(@Args('token') token: string) {
     return this.reviewsService.validateToken(token);
   }
   @Mutation(() => ReviewType, {
