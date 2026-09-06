@@ -1,5 +1,6 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Project } from "../types/portfolio";
+import { imageSrc } from "../utils/helpers";
 interface ProjectCardProps {
   p: Project;
   t: any;
@@ -28,7 +29,7 @@ export default function ProjectCard({
       {has ? <button className="b-cover" onClick={() => onOpen(p)} aria-label={`${t.gallery} — ${p.name}`}>
           {isGeneratedSvg ? <div dangerouslySetInnerHTML={{
         __html: rawSvgContent
-      }} className="b-svg-wrapper" /> : <img src={fullCoverUrl} alt="" />}
+      }} className="b-svg-wrapper" /> : <img src={imageSrc(p.images[0].url)} alt={`${p.name} — 1`} />}
           {p.images.length > 1 && <span className="b-stackmark">+{p.images.length - 1}</span>}
         </button> : <div className="b-cover b-cover-empty">
           <span>{t.noShots}</span>

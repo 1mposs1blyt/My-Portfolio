@@ -89,9 +89,9 @@ export default function ProjectsPage() {
       list.map((p) =>
         p.id === id
           ? {
-              ...p,
-              ...changes,
-            }
+            ...p,
+            ...changes,
+          }
           : p,
       ),
     );
@@ -100,6 +100,7 @@ export default function ProjectsPage() {
       say("Название и описание обязательны");
       return;
     }
+
     const stack = (stackText[item.id] ?? "")
       .split(",")
       .map((s) => s.trim())
@@ -113,31 +114,34 @@ export default function ProjectsPage() {
       stack,
       order: item.order,
     };
+
     if (!isEditor) {
       say("Демо-режим: не сохранено");
       return;
     }
+
     setSavingId(item.id);
     const isNew = item.id.startsWith("new-");
     const res = isNew
-      ? await createProject({
-          input: payload,
-        })
-      : await updateProject({
-          input: {
-            id: item.id,
-            ...payload,
-          },
-        });
+      ? await createProject({ input: payload })
+      : await updateProject({ input: { id: item.id, ...payload } });
     setSavingId(null);
+
     if (res.error) {
       say(res.error.message.replace("[GraphQL] ", ""));
       return;
     }
-    if (isNew)
-      patch(item.id, {
-        id: res.data.createProject.id,
+
+    if (isNew) {
+      const newId = res.data.createProject.id;
+      // переносим текст стека под настоящий id, иначе поле опустеет
+      setStackText((s) => {
+        const { [item.id]: text, ...rest } = s;
+        return { ...rest, [newId]: text ?? "" };
       });
+      patch(item.id, { id: newId });
+    }
+
     say("Сохранено");
   };
   const remove = async (item: Project) => {

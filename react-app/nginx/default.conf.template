@@ -35,7 +35,7 @@ server {
   }
 
   # загруженные картинки раздаёт Nest через ServeStaticModule
-  location /public/ {
+  location ^~ /public/ {
     proxy_pass ${BACKEND_ORIGIN};
     proxy_set_header Host $host;
     expires 30d;

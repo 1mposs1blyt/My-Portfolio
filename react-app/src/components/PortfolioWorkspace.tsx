@@ -120,21 +120,21 @@ export default function PortfolioWorkspace() {
     setActive(id);
   };
   return <div className="b-root" ref={scope}>
-      <Sidebar lang={lang} setLang={setLang} active={active} onNavigate={handleNavigate} t={t} name={profile?.name || "Александр"} headline={profile?.headline || "Разработчик"} available={available} />
+    <Sidebar lang={lang} setLang={setLang} active={active} onNavigate={handleNavigate} t={t} name={profile?.name || "Александр"} headline={profile?.headline || "Разработчик"} available={available} />
 
-      <main className="b-main">
-        <TerminalPane lang={lang} t={t} />
+    <main className="b-main">
+      <TerminalPane lang={lang} t={t} />
 
-        <AboutSection t={t} />
-        <ProjectsSection t={t} projects={projects} onOpenGallery={setOpen} />
-        <ReviewsSection t={t} reviews={allReviews} />
-        <SkillsSection t={t} skills={skills} />
-        <ExperienceSection t={t} experience={experience} />
-        <ContactsSection t={t} links={links} />
+      <AboutSection t={t} profile={profile} />
+      <ProjectsSection t={t} projects={projects} onOpenGallery={setOpen} />
+      <ReviewsSection t={t} reviews={allReviews} />
+      <SkillsSection t={t} skills={skills} />
+      <ExperienceSection t={t} experience={experience} />
+      <ContactsSection t={t} links={links} />
 
-        {error && <div className="b-error-toast">Связь с NestJS потеряна: {error}</div>}
-      </main>
+      {error && <div className="b-error-toast">Связь с NestJS потеряна: {error}</div>}
+    </main>
 
-      {open && <Gallery project={open} t={t} onClose={() => setOpen(null)} />}
-    </div>;
+    {open && <Gallery project={open} t={t} onClose={() => setOpen(null)} />}
+  </div>;
 }

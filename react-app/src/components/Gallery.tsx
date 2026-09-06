@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { imageSrc } from "../utils/helpers";
 import { Project } from "../types/portfolio";
 interface GalleryProps {
   project: Project;
@@ -55,7 +56,7 @@ export default function Gallery({
         }} className="b-svg-stage-wrapper" style={{
           width: "100%",
           height: "100%"
-        }} /> : <img src={fullCoverUrl} alt={`${project.name} — ${i + 1}`} />)}
+          }} /> : <img src={imageSrc(images[i].url)} alt={`${project.name} — ${i + 1}`} />)}
           {images.length > 1 && <>
               <button className="b-nav b-nav-l" onClick={() => go(-1)} aria-label={t.prev}>
                 ‹
@@ -71,11 +72,11 @@ export default function Gallery({
             {images.map((img, k) => {
           const isThumbGenerated = img.url.startsWith("data:image/svg+xml,");
           const thumbSvgContent = isThumbGenerated ? decodeURIComponent(img.url.replace("data:image/svg+xml,", "")) : "";
-          const thumbUrl = img.url.includes("public") ? `${backendUrl}${img.url.startsWith("/") ? "" : "/"}${img.url}` : img.url;
+          // const thumbUrl = img.url.includes("public") ? `${backendUrl}${img.url.startsWith("/") ? "" : "/"}${img.url}` : img.url;
           return <button key={k} className="b-thumb" data-on={String(k === i)} onClick={() => setI(k)} aria-label={String(k + 1)}>
                   {isThumbGenerated ? <div dangerouslySetInnerHTML={{
               __html: thumbSvgContent
-            }} className="b-svg-thumb-wrapper" /> : <img src={thumbUrl} alt="" />}
+            }} className="b-svg-thumb-wrapper" /> : <img src={imageSrc(img.url)} alt={String(k + 1)} />}
                 </button>;
         })}
           </div>}
