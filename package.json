@@ -1,7 +1,23 @@
 {
+  "name": "portfolio",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n api,web -c magenta,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm --prefix nestjs-app run start:dev",
+    "dev:web": "npm --prefix react-app run dev",
+    "install:all": "npm install && npm --prefix nestjs-app install && npm --prefix react-app install",
+    "build": "npm --prefix nestjs-app run build && npm --prefix react-app run build",
+    "up": "docker compose up --build",
+    "up:d": "docker compose up --build -d",
+    "down": "docker compose down",
+    "logs": "docker compose logs -f",
+    "clean": "node cleaner.mjs",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\""
+  },
   "devDependencies": {
     "@babel/generator": "^8.0.0",
     "@babel/parser": "^8.0.4",
+    "concurrently": "^9.2.4",
     "prettier": "^3.9.6"
   }
 }
