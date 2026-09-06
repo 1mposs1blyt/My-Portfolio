@@ -3,3 +3,5 @@ dist
 *.sql
 backup*.sql
 .git
+.env
+.env.*

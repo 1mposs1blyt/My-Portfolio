@@ -1,3 +1,6 @@
 node_modules
 plan.md
 .env
+backup*.sql
+backup*.sql
+uploads.tar.gz
