@@ -5,7 +5,8 @@ FROM dockerhub.timeweb.cloud/library/node:22-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN RUN npm install
+RUN npm install
+
 
 COPY . .
 
