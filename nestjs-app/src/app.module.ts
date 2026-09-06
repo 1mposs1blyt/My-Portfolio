@@ -21,12 +21,28 @@ import { UploadModule } from './upload/upload.module.js';
   }), ServeStaticModule.forRoot({
     rootPath: join(process.cwd(), 'public'),
     serveRoot: '/public'
-  }), PrismaModule, GraphQLModule.forRoot<ApolloDriverConfig>({
+  }), PrismaModule,
+  GraphQLModule.forRoot<ApolloDriverConfig>({
     driver: ApolloDriver,
     autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     playground: false,
-    plugins: [ApolloServerPluginLandingPageLocalDefault()]
-  }), ProfileModule, ProjectsModule, SkillsModule, ReviewsModule, LinksModule, ExperienceModule, UploadModule],
+    introspection: process.env.NODE_ENV !== 'production',
+    plugins:
+      process.env.NODE_ENV === 'production'
+        ? []
+        : [ApolloServerPluginLandingPageLocalDefault()],
+    formatError: (error) => ({
+      message: error.message,
+      path: error.path,
+      extensions: {
+        code: error.extensions?.code,
+        ...(process.env.NODE_ENV !== 'production' && {
+          stacktrace: error.extensions?.stacktrace,
+        }),
+      },
+    }),
+  }),
+    ProfileModule, ProjectsModule, SkillsModule, ReviewsModule, LinksModule, ExperienceModule, UploadModule],
   providers: []
 })
-export class AppModule {}
+export class AppModule { }
