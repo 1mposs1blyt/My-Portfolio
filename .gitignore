@@ -3,4 +3,5 @@ plan.md
 .env
 backup*.sql
 backup*.sql
+backup*.*
 uploads.tar.gz
