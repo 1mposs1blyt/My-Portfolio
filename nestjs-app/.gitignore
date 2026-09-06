@@ -59,3 +59,7 @@ dist/
 
 /src/generated/prisma
 tsconfig.build.tsbuildinfo
+
+# db backups
+backup*.sql
+backup-****-**-**.sql
