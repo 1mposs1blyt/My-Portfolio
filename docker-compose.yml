@@ -10,7 +10,11 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-portfolio} -d ${POSTGRES_DB:-portfolio}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-portfolio} -d ${POSTGRES_DB:-portfolio}",
+        ]
       interval: 5s
       timeout: 3s
       retries: 12
@@ -28,8 +32,8 @@ services:
       ADMIN_TOKEN: "${ADMIN_TOKEN}"
     volumes:
       - uploads:/app/public/uploads
-    ports:
-      - "3000:3000"
+    # ports:
+    #   - "3000:3000"
 
   web:
     build:
@@ -41,8 +45,11 @@ services:
     depends_on:
       - app
     ports:
-      - "4173:80"
-
+      - "80:80" # Сюда будут приходить обычные запросы и проверки Certbot
+      - "443:443" # Сюда будут приходить запросы HTTPS
+    volumes:
+      # Пробрасываем папку с ключами внутрь контейнера
+      - /etc/letsencrypt:/etc/nginx/certs
 volumes:
   db-data:
   uploads:

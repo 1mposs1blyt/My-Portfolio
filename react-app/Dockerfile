@@ -21,7 +21,10 @@ RUN npm run build
 FROM dockerhub.timeweb.cloud/library/nginx:alpine AS runner
 
 COPY --from=builder /app/dist /usr/share/nginx/html
+# закоментировать, если не нужно SSL и следовать коментарию ниже
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+# раскомментировать, если нужно SSL и следовать коментарию выше
+# COPY nginx/ssl.conf.template /etc/nginx/templates/ssl.conf.template
 
 # значение по умолчанию, если BACKEND_ORIGIN не передан
 ENV BACKEND_ORIGIN=http://app:3000
