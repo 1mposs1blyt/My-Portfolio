@@ -1,0 +1,46 @@
+services:
+  db:
+    image: cockroachdb/cockroach:v24.3.5
+    command: start-single-node --insecure
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    volumes:
+      - db-data:/cockroach/cockroach-data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+
+  app:
+    build: ./nestjs-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://root@db:26257/defaultdb?sslmode=disable"
+      PORT: "3000"
+      NODE_ENV: "production"
+      ADMIN_TOKEN: "${ADMIN_TOKEN}"
+    volumes:
+      # без этого загруженные картинки исчезнут при пересборке контейнера
+      - uploads:/app/public/uploads
+    ports:
+      - "3000:3000"
+
+  web:
+    build:
+      context: ./react-app
+      args:
+        # пусто = фронт ходит на свой origin, nginx проксирует на app
+        VITE_BACKEND_URL: ""
+    depends_on:
+      - app
+    ports:
+      - "4173:80"
+
+volumes:
+  db-data:
+  uploads:

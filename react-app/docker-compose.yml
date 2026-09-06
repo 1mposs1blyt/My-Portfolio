@@ -1,0 +1,14 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        # пусто = фронт стучится на свой origin, дальше работает прокси nginx
+        VITE_BACKEND_URL: ""
+    environment:
+      BACKEND_ORIGIN: "${BACKEND_ORIGIN:-http://host.docker.internal:3333}"
+    extra_hosts:
+      # чтобы из контейнера достучаться до бэкенда на самой машине
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "4173:80"

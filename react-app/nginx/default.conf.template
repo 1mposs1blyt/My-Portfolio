@@ -1,0 +1,55 @@
+# Образ nginx:alpine на старте прогоняет файлы из /etc/nginx/templates/
+# через envsubst и кладёт результат в /etc/nginx/conf.d/.
+# Подставляются только объявленные переменные окружения, так что
+# nginx-овские $uri и $host остаются нетронутыми.
+#
+# BACKEND_ORIGIN — куда проксировать API:
+#   в общем compose  → http://app:3000
+#   при отдельном    → http://192.168.1.62:3333
+
+server {
+  listen 80;
+  server_name _;
+
+  root /usr/share/nginx/html;
+  index index.html;
+
+  gzip on;
+  gzip_types text/css application/javascript application/json image/svg+xml;
+  gzip_min_length 1024;
+
+  location /graphql {
+    proxy_pass ${BACKEND_ORIGIN};
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  location /upload/ {
+    proxy_pass ${BACKEND_ORIGIN};
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    # без этого скриншот больше 1 МБ упадёт с 413
+    client_max_body_size 10m;
+  }
+
+  # загруженные картинки раздаёт Nest через ServeStaticModule
+  location /public/ {
+    proxy_pass ${BACKEND_ORIGIN};
+    proxy_set_header Host $host;
+    expires 30d;
+    add_header Cache-Control "public";
+  }
+
+  location ~* \.(js|css|woff2|svg|png|jpg|jpeg|webp|ico)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+    try_files $uri =404;
+  }
+
+  # SPA-фоллбэк: без него прямой заход на /admin и /review даст 404
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}

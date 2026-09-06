@@ -1,4 +1,5 @@
-:root {
+
+.adm-root {
   --bg: #0a0810;
   --panel: #14101f;
   --panel2: #1a1428;
@@ -7,9 +8,7 @@
   --dim: #7e769a;
   --violet: #8b5cf6;
   --magenta: #ff3da6;
-}
 
-.adm-root {
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
@@ -463,10 +462,6 @@
   justify-content: center;
   background: rgba(6, 4, 10, 0.85);
   padding: 20px;
-  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text);
 }
 .adm-modal-box {
   width: 100%;
