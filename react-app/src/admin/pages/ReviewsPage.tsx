@@ -83,8 +83,21 @@ export default function ReviewsPage() {
     window.setTimeout(() => setStatus(null), 3000);
   };
   const copy = async (id: string) => {
+    const link = linkFor(id);
+    setFresh(id);                        // поле внизу тоже обновится
     try {
-      await navigator.clipboard.writeText(linkFor(id));
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(link);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = link;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
       say("Ссылка скопирована");
     } catch {
       say("Не удалось скопировать — выдели вручную");
@@ -165,7 +178,7 @@ export default function ReviewsPage() {
     <div className="adm-page adm-page-wide">
       <h1 className="adm-h1">Отзывы</h1>
 
-      {}
+      { }
       <section className="adm-card">
         <h2 className="adm-h2">Новая ссылка</h2>
 
@@ -246,7 +259,7 @@ export default function ReviewsPage() {
         )}
       </section>
 
-      {}
+      { }
       <section className="adm-card">
         <h2 className="adm-h2">
           Выданные ссылки <span className="adm-count">{tokens.length}</span>
@@ -306,7 +319,7 @@ export default function ReviewsPage() {
         )}
       </section>
 
-      {}
+      { }
       <section className="adm-card">
         <h2 className="adm-h2">
           Полученные <span className="adm-count">{reviews.length}</span>
