@@ -412,6 +412,7 @@ html {
 }
 .b-prose p {
   margin: 0 0 12px;
+  white-space: pre-wrap;
 }
 .b-meta {
   color: var(--dim);
