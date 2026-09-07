@@ -1,256 +1,372 @@
 import 'dotenv/config';
-import pg from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
-import {
-  LinkKind,
-  PrismaClient,
-  SkillCategory,
-} from '../src/generated/prisma/client.js';
+import { PrismaClient, Language, LinkKind, SkillCategory, ReviewType } from '../src/generated/prisma/client.js';
 
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
-const adapter = new PrismaPg(pool);
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 const PROFILE_ID = '00000000-0000-0000-0000-000000000001';
 
-async function main() {
-  // Сид больше не удаляет данные: если профиль уже есть, выходим.
-  // Чтобы залить заново — сначала снеси профиль руками.
-  // Запуск с FORCE_SEED=1 очистит и пересоздаст всё.
-  const existing = await prisma.profile.findFirst();
-  
-  if (existing && process.env.FORCE_SEED !== '1') {
-    console.log('Профиль уже существует — сид пропущен');
-    return;
-  }
+async function wipe() {
+  // порядок важен: сначала то, что ни от чего не каскадится
+  await prisma.reviewTranslation.deleteMany();
+  await prisma.review.deleteMany();
+  await prisma.reviewToken.deleteMany();
+  await prisma.achievementTranslation.deleteMany();
+  await prisma.achievement.deleteMany();
+  await prisma.experienceTranslation.deleteMany();
+  await prisma.experience.deleteMany();
+  await prisma.projectImage.deleteMany();
+  await prisma.projectTranslation.deleteMany();
+  await prisma.project.deleteMany();
+  await prisma.profileTranslation.deleteMany();
+  await prisma.profileLink.deleteMany();
+  await prisma.skill.deleteMany();
+  await prisma.profile.deleteMany();
+  console.log('— всё снесено');
+}
 
-  await prisma.$transaction(async (tx) => {
-    if (existing) {
-      await tx.achievement.deleteMany();
-      await tx.projectImage.deleteMany();
-      await tx.profileLink.deleteMany();
-      await tx.skill.deleteMany();
-      await tx.experience.deleteMany();
-      await tx.project.deleteMany();
-      await tx.profile.deleteMany();
-    }
+async function seed() {
+  const profile = await prisma.profile.create({
+    data: {
+      id: PROFILE_ID,
+      email: 'alexander@example.ru',
+      profileTranslations: {
+        create: [
+          {
+            language: Language.RU,
+            name: 'Александр Брягиня',
+            headline: 'Full-stack разработчик',
+            description:
+              'Пишу на TypeScript уже несколько лет: Node.js и NestJS на бэкенде, React и React Native на фронте. Люблю задачи, где надо разобраться в чужой предметной области и собрать из неё работающий продукт.',
+            location: 'Хельсинки, удалённо',
+          },
+          {
+            language: Language.EN,
+            name: 'Alexander Bryaginya',
+            headline: 'Full-stack developer',
+            description:
+              'TypeScript developer with several years of experience: Node.js and NestJS on the backend, React and React Native on the frontend. I enjoy projects where you have to dig into an unfamiliar domain and turn it into a working product.',
+            location: 'Helsinki, remote',
+          },
+        ],
+      },
+      links: {
+        create: [
+          { kind: LinkKind.GITHUB, label: 'GitHub', url: 'https://github.com/1mposs1blyt', order: 0 },
+          { kind: LinkKind.TELEGRAM, label: 'Telegram', url: 'https://t.me/username', order: 1 },
+          { kind: LinkKind.EMAIL, label: 'alexander@example.ru', url: 'mailto:alexander@example.ru', order: 2 },
+          { kind: LinkKind.WEBSITE, label: 'Портфолио', url: 'https://1mposs1blyt.duckdns.org', order: 3 },
+        ],
+      },
+      skills: {
+        create: [
+          { name: 'TypeScript', category: SkillCategory.LANGUAGE, level: 5, order: 0 },
+          { name: 'JavaScript', category: SkillCategory.LANGUAGE, level: 5, order: 1 },
+          { name: 'SQL', category: SkillCategory.LANGUAGE, level: 4, order: 2 },
+          { name: 'React', category: SkillCategory.FRONTEND, level: 5, order: 0 },
+          { name: 'React Native', category: SkillCategory.FRONTEND, level: 4, order: 1 },
+          { name: 'Next.js', category: SkillCategory.FRONTEND, level: 4, order: 2 },
+          { name: 'Node.js', category: SkillCategory.BACKEND, level: 5, order: 0 },
+          { name: 'NestJS', category: SkillCategory.BACKEND, level: 5, order: 1 },
+          { name: 'GraphQL', category: SkillCategory.BACKEND, level: 4, order: 2 },
+          { name: 'PostgreSQL', category: SkillCategory.DATABASE, level: 4, order: 0 },
+          { name: 'Prisma', category: SkillCategory.DATABASE, level: 5, order: 1 },
+          { name: 'Redis', category: SkillCategory.DATABASE, level: 3, order: 2 },
+          { name: 'Docker', category: SkillCategory.INFRA, level: 4, order: 0 },
+          { name: 'nginx', category: SkillCategory.INFRA, level: 3, order: 1 },
+          { name: 'Git', category: SkillCategory.TOOL, level: 5, order: 0 },
+          { name: 'Vite', category: SkillCategory.TOOL, level: 4, order: 1 },
+        ],
+      },
+    },
+  });
+  console.log('— профиль, ссылки, навыки');
 
-    await tx.profile.create({
+  // ---------- ОПЫТ ----------
+
+  const experiences = [
+    {
+      company: 'SoftTrade',
+      startDate: new Date('2024-08-01'),
+      endDate: null,
+      ru: {
+        position: 'Инженер-программист',
+        description: 'Разработка внутренних сервисов компании на NestJS и React.',
+        achievements: [
+          'Перевёл REST API на GraphQL, время ответа на составных запросах упало вдвое',
+          'Настроил CI с прогоном тестов и автодеплоем в staging',
+          'Собрал систему локализации контента на уровне БД',
+        ],
+      },
+      en: {
+        position: 'Software Engineer',
+        description: 'Building internal company services with NestJS and React.',
+        achievements: [
+          'Migrated the REST API to GraphQL, halving response time on composite queries',
+          'Set up CI with automated tests and staging deployment',
+          'Built a database-level content localization system',
+        ],
+      },
+    },
+    {
+      company: 'Фриланс',
+      startDate: new Date('2022-03-01'),
+      endDate: new Date('2024-07-31'),
+      ru: {
+        position: 'Full-stack разработчик',
+        description: 'Заказные проекты для малого бизнеса: от лендингов до кассовых систем.',
+        achievements: [
+          'Сделал кассовое приложение для сети кофеен на React Native',
+          'Автоматизировал выгрузку отчётности, сэкономив заказчику день работы в неделю',
+        ],
+      },
+      en: {
+        position: 'Full-stack Developer',
+        description: 'Freelance projects for small businesses, from landing pages to POS systems.',
+        achievements: [
+          'Built a React Native POS app for a coffee shop chain',
+          'Automated reporting exports, saving the client a day of work per week',
+        ],
+      },
+    },
+    {
+      company: 'ITL Group',
+      startDate: new Date('2021-06-01'),
+      endDate: new Date('2022-02-28'),
+      ru: {
+        position: 'Junior-разработчик',
+        description: 'Поддержка и доработка веб-приложений на Node.js.',
+        achievements: [
+          'Закрыл технический долг по миграциям, ускорив выкатки',
+          'Написал первые интеграционные тесты в проекте',
+        ],
+      },
+      en: {
+        position: 'Junior Developer',
+        description: 'Maintaining and extending Node.js web applications.',
+        achievements: [
+          'Cleared migration tech debt, speeding up releases',
+          "Wrote the project's first integration tests",
+        ],
+      },
+    },
+  ];
+
+  for (const exp of experiences) {
+    const created = await prisma.experience.create({
       data: {
-        id: PROFILE_ID,
-        name: 'Александр Брягиня',
-        headline: 'Full-stack software developer',
-        description:
-          'Делаю продукты целиком: бэкенд на NestJS с GraphQL и Prisma, интерфейсы на React, десктоп и мобильные приложения. Много работал с интеграциями — кассовые системы, сервис-деск, мессенджеры: беру чужой API и превращаю его в инструмент, которым пользуются каждый день.',
-        email: 'alexandr.bryaginya@gmail.com',
-        location: 'Новосибирск, Россия',
-
-        links: {
+        profileId: profile.id,
+        company: exp.company,
+        startDate: exp.startDate,
+        endDate: exp.endDate,
+        experienceTranslations: {
           create: [
-            {
-              kind: LinkKind.GITHUB,
-              label: '1mposs1blyt',
-              url: 'https://github.com/1mposs1blyt',
-              order: 1,
-            },
-            {
-              kind: LinkKind.TELEGRAM,
-              label: '@alexandr_st54_nsk',
-              url: 'https://t.me/alexandr_st54_nsk',
-              order: 2,
-            },
-            {
-              kind: LinkKind.EMAIL,
-              label: 'alexandr.bryaginya@gmail.com',
-              url: 'mailto:alexandr.bryaginya@gmail.com',
-              order: 3,
-            },
-          ],
-        },
-
-        skills: {
-          create: [
-            { name: 'TypeScript', category: SkillCategory.LANGUAGE, level: 5, order: 1 },
-            { name: 'JavaScript', category: SkillCategory.LANGUAGE, level: 5, order: 2 },
-            { name: 'SQL', category: SkillCategory.LANGUAGE, level: 4, order: 3 },
-
-            { name: 'React', category: SkillCategory.FRONTEND, level: 5, order: 1 },
-            { name: 'React Native', category: SkillCategory.FRONTEND, level: 4, order: 2 },
-            { name: 'Next.js', category: SkillCategory.FRONTEND, level: 4, order: 3 },
-
-            { name: 'Node.js', category: SkillCategory.BACKEND, level: 5, order: 1 },
-            { name: 'NestJS', category: SkillCategory.BACKEND, level: 5, order: 2 },
-            { name: 'Express', category: SkillCategory.BACKEND, level: 4, order: 3 },
-            { name: 'GraphQL', category: SkillCategory.BACKEND, level: 4, order: 4 },
-
-            { name: 'PostgreSQL', category: SkillCategory.DATABASE, level: 4, order: 1 },
-            { name: 'Prisma', category: SkillCategory.DATABASE, level: 5, order: 2 },
-            { name: 'SQLite', category: SkillCategory.DATABASE, level: 4, order: 3 },
-
-            { name: 'Docker', category: SkillCategory.INFRA, level: 4, order: 1 },
-            { name: 'nginx', category: SkillCategory.INFRA, level: 3, order: 2 },
-
-            { name: 'Git', category: SkillCategory.TOOL, level: 5, order: 1 },
-            { name: 'Electron', category: SkillCategory.TOOL, level: 4, order: 2 },
-            { name: 'Tauri', category: SkillCategory.TOOL, level: 3, order: 3 },
-          ],
-        },
-
-        experience: {
-          create: [
-            {
-              company: 'SoftTrade / Freelance',
-              position: 'Full-Stack Developer',
-              description: 'Разработка веб- и мобильных сервисов, интеграции со сторонними API.',
-              startDate: new Date('2024-01-01'),
-              achievements: {
-                create: [
-                  {
-                    text: 'Разработал сервисы учёта и интеграции с фискальными регистраторами',
-                    order: 1,
-                  },
-                  {
-                    text: 'Спроектировал GraphQL API для цифровых систем управления',
-                    order: 2,
-                  },
-                  {
-                    text: 'Связал сервис-деск Okdesk с мессенджерами: заявки создаются и отслеживаются из чата',
-                    order: 3,
-                  },
-                ],
-              },
-            },
-          ],
-        },
-
-        projects: {
-          create: [
-            {
-              name: 'Это портфолио',
-              description:
-                'Сайт вместе с админкой. Контент лежит в PostgreSQL, отдаётся через GraphQL, редактируется через /admin — она открыта всем в демо-режиме: формы, валидация и загрузка работают, но правки живут только в вашей вкладке. Запись в базу открывает токен в заголовке, проверка на бэкенде через timing-safe сравнение хешей. Отзывы собираются по одноразовым ссылкам с ограниченным сроком жизни. Всё поднимается одной командой в Docker: Postgres, NestJS и nginx.',
-              repoUrl: 'https://github.com/1mposs1blyt',
-              stack: [
-                'TypeScript',
-                'React',
-                'Vite',
-                'urql',
-                'NestJS',
-                'GraphQL',
-                'Prisma',
-                'PostgreSQL',
-                'Docker',
-                'nginx',
-              ],
-              order: 1,
-            },
-            {
-              name: 'SaveurBooking',
-              description:
-                'Тестовое задание для Saveur Studio: бронирование столика с валидацией на клиенте. Правила вынесены в схемы Zod, форма на неконтролируемых полях React Hook Form — ввод без задержек и лишних ререндеров. Временные слоты генерируются от текущего момента: прошедшие часы сегодняшнего дня недоступны, горизонт брони ограничен 90 днями. Маска телефона форматирует номер прямо при вводе.',
-              repoUrl: 'https://github.com/1mposs1blyt/saveur-booking-task',
-              liveUrl:
-                'https://saveur-booking-task-g2m7u3rj6-1mposs1blyts-projects.vercel.app/',
-              stack: [
-                'Next.js',
-                'React',
-                'TypeScript',
-                'React Hook Form',
-                'Zod',
-                'Tailwind',
-                'Framer Motion',
-              ],
-              order: 2,
-            },
-            {
-              name: 'Moto-voice-chat',
-              description:
-                'Голосовая рация для байкеров в поездках без мобильной связи: телефоны соединяются через Wi-Fi-хотспот, интернет и сервер не нужны. Устройства находят друг друга сами через Zeroconf, аудио идёт по WebRTC с шумо- и эхоподавлением, сигналинг — напрямую по UDP между телефонами. Требует нативной сборки: задействованы модули микрофона и сети. В разработке.',
-              repoUrl: 'https://github.com/1mposs1blyt/moto-voice-chat',
-              stack: ['React Native', 'Expo', 'WebRTC', 'Zeroconf', 'UDP', 'NativeWind'],
-              order: 3,
-            },
-            {
-              name: 'Telegram Bot Manager',
-              description:
-                'Десктопное приложение для управления ботами на удалённых серверах: запуск, остановка, статус и поток входящих сообщений в реальном времени. Подключение к серверам по SSH, команды и логи идут через сокет, конфигурация ботов хранится локально в SQLite. Собирается под Windows, Linux и macOS, ставится как обычное приложение или запускается портативно из папки.',
-              stack: ['Electron', 'Node.js', 'Socket.IO', 'SQLite'],
-              order: 4,
-            },
-            {
-              name: 'Бот заявок Telegram/Max → Okdesk',
-              description:
-                'Заявки в сервис-деск создаются прямо из телеграма, без перехода в интерфейс Okdesk. Бот переносит текст и вложения, а автора определяет по username и сам подставляет его в нужные поля Okdesk API — заявка приходит уже привязанной к конкретному клиенту. Позже переписан под мессенджер MAX: бизнес-логика вынесена из транспортного слоя, так что смена платформы затронула только адаптер отправки.',
-              stack: ['Node.js', 'Telegram Bot API', 'Okdesk API'],
-              order: 5,
-            },
-            {
-              name: 'Уведомления Okdesk → Telegram',
-              description:
-                'Заявки без ответственного не теряются: бот принимает вебхук от Okdesk, фильтрует события по статусу и присылает в рабочий чат карточку с заголовком, описанием и ссылками на исходное сообщение и автора. Обратная сторона к боту создания заявок — вместе они замыкают цикл.',
-              stack: ['Node.js', 'Express', 'Okdesk Webhooks', 'Telegram Bot API'],
-              order: 6,
-            },
-            {
-              name: 'mbox → xlsx с классификацией писем',
-              description:
-                'Разбирает архив почты из Thunderbird в таблицу с готовыми категориями. Конвейер из трёх шагов: парсинг mbox в JSON, определение категории письма через LLM по теме и тексту, сборка xlsx. Промежуточные результаты сохраняются в файлы, поэтому дорогой шаг классификации не повторяется при перезапуске. Собран в самостоятельный .exe с интерактивным меню и настройкой через .env — заказчику не нужен установленный Node.',
-              stack: ['Node.js', 'TypeScript', 'Inquirer', 'xlsx', 'mbox-parser'],
-              order: 7,
-            },
-            {
-              name: 'Мост 1С → iikoChain',
-              description:
-                'Убрал ручной перенос номенклатуры между 1С и iikoChain. Парсинг xlsx на сервере, маппинг полей в формат iiko API, пакетная отправка актов приготовления с обработкой частичных отказов.',
-              stack: ['Node.js', 'Express', 'jQuery', 'xlsx'],
-              order: 8,
-            },
-            {
-              name: 'Эйн&Штейн — платформа устного счёта',
-              description:
-                'Веб-платформа для школы ментальной арифметики: тренажёры устного счёта и учёт результатов учеников. Сессионная авторизация, генерация примеров по уровням сложности, серверный рендеринг на Express.',
-              stack: ['Node.js', 'Express', 'Bootstrap 5'],
-              order: 9,
-            },
-            {
-              name: 'EinsteinBot — бот подбора программ обучения',
-              description:
-                'Телеграм-бот для языковой школы: проводит диалог с родителем, собирает контакты и формат занятий, подбирает подходящую программу. Заявка уходит менеджеру. Сейчас не развёрнут.',
-              stack: ['Node.js', 'Telegram Bot API'],
-              order: 10,
-            },
-            {
-              name: 'Конвертер характеристик товаров в HTML',
-              description:
-                'Заменил PHP-скрипт при переезде сайта на другой движок: разбирает выгрузку xlsx, где характеристики товара лежат одной строкой с разделителями, и собирает из них готовую HTML-таблицу в отдельной колонке. Обработка идёт пакетно по всему файлу, результат сразу пригоден для импорта в новую CMS.',
-              stack: ['Node.js', 'xlsx'],
-              order: 11,
-            },
-            {
-              name: 'Одностраничный сайт для студента',
-              description:
-                'Одностраничный сайт с каталогом объектов и хранением данных в SQLite. Сделан как учебный проект: помимо кода — разбор реализации, чтобы заказчик мог поддерживать сайт сам.',
-              stack: ['Node.js', 'Express', 'SQLite'],
-              order: 12,
-            },
+            { language: Language.RU, position: exp.ru.position, description: exp.ru.description },
+            { language: Language.EN, position: exp.en.position, description: exp.en.description },
           ],
         },
       },
     });
-  });
 
-  console.log('Database seeded successfully!');
+    for (let i = 0; i < exp.ru.achievements.length; i++) {
+      await prisma.achievement.create({
+        data: {
+          experienceId: created.id,
+          order: i,
+          achievementTranslations: {
+            create: [
+              { language: Language.RU, text: exp.ru.achievements[i] },
+              { language: Language.EN, text: exp.en.achievements[i] },
+            ],
+          },
+        },
+      });
+    }
+  }
+  console.log('— опыт и достижения');
+
+  // ---------- ПРОЕКТЫ ----------
+
+  const projects = [
+    {
+      order: 0,
+      repoUrl: 'https://github.com/1mposs1blyt/portfolio',
+      liveUrl: 'https://1mposs1blyt.duckdns.org',
+      stack: ['NestJS', 'GraphQL', 'Prisma', 'React', 'PostgreSQL'],
+      images: ['/public/uploads/portfolio-1.png', '/public/uploads/portfolio-2.png'],
+      ru: {
+        name: 'Портфолио',
+        description:
+          'Сайт-визитка с админкой и полной локализацией RU/EN на уровне базы. Бэкенд на NestJS с GraphQL, фронт на React, интерфейс стилизован под редактор кода.',
+      },
+      en: {
+        name: 'Portfolio',
+        description:
+          'A personal site with an admin panel and full RU/EN localization at the database level. NestJS with GraphQL on the backend, React on the frontend, styled after a code editor.',
+      },
+    },
+    {
+      order: 1,
+      repoUrl: 'https://github.com/1mposs1blyt/pos-system',
+      liveUrl: null,
+      stack: ['React Native', 'TypeScript', 'Node.js', 'PostgreSQL'],
+      images: ['/public/uploads/pos-1.png'],
+      ru: {
+        name: 'Кассовая система',
+        description:
+          'Аналог iiko Front для небольших заведений: заказы, столы, печать чеков, работа офлайн с последующей синхронизацией. Продаётся по подписке с тарифными уровнями.',
+      },
+      en: {
+        name: 'POS System',
+        description:
+          'An iiko Front alternative for small venues: orders, tables, receipt printing, offline mode with later sync. Sold as a subscription with tiered plans.',
+      },
+    },
+    {
+      order: 2,
+      repoUrl: 'https://github.com/1mposs1blyt/pos-analytics',
+      liveUrl: null,
+      stack: ['React Native', 'Expo', 'GraphQL', 'Recharts'],
+      images: ['/public/uploads/analytics-1.png', '/public/uploads/analytics-2.png'],
+      ru: {
+        name: 'Аналитика продаж',
+        description:
+          'Мобильное приложение для владельцев кассовых сетей: выручка по точкам, средний чек, топ товаров и рейтинг кассиров. Данные обновляются в реальном времени.',
+      },
+      en: {
+        name: 'Sales Analytics',
+        description:
+          'A mobile app for POS network owners: revenue by location, average check, top products and a cashier leaderboard. Data updates in real time.',
+      },
+    },
+    {
+      order: 3,
+      repoUrl: 'https://github.com/1mposs1blyt/booking-widget',
+      liveUrl: 'https://example.com/booking',
+      stack: ['Next.js', 'TypeScript', 'Prisma'],
+      images: [],
+      ru: {
+        name: 'Виджет бронирования',
+        description:
+          'Встраиваемый виджет записи для салонов и клиник: выбор мастера, свободных слотов и услуги, уведомления в Telegram.',
+      },
+      en: {
+        name: 'Booking Widget',
+        description:
+          'An embeddable booking widget for salons and clinics: pick a specialist, an available slot and a service, with Telegram notifications.',
+      },
+    },
+  ];
+
+  const createdProjects: { id: string; name: string }[] = [];
+
+  for (const p of projects) {
+    const created = await prisma.project.create({
+      data: {
+        profileId: profile.id,
+        repoUrl: p.repoUrl,
+        liveUrl: p.liveUrl,
+        stack: p.stack,
+        order: p.order,
+        projectTranslations: {
+          create: [
+            { language: Language.RU, name: p.ru.name, description: p.ru.description },
+            { language: Language.EN, name: p.en.name, description: p.en.description },
+          ],
+        },
+        images: {
+          create: p.images.map((url, order) => ({ url, order })),
+        },
+      },
+    });
+    createdProjects.push({ id: created.id, name: p.ru.name });
+  }
+  console.log('— проекты и изображения');
+
+  // ---------- ОТЗЫВЫ ----------
+
+  const reviews = [
+    {
+      type: ReviewType.CLIENT,
+      authorName: 'Мария Ковалёва',
+      company: 'Coffee Point',
+      rating: 5,
+      projectIndex: 1,
+      ru: { position: 'Владелица сети', text: 'Кассовое приложение закрыло все наши задачи, а правки вносились в тот же день. Отдельно порадовало, что всё работает без интернета.' },
+      en: { position: 'Chain owner', text: 'The POS app covered everything we needed, and fixes landed the same day. The offline mode was a particularly nice touch.' },
+    },
+    {
+      type: ReviewType.CLIENT,
+      authorName: 'Дмитрий Орлов',
+      company: 'Studio Nine',
+      rating: 5,
+      projectIndex: 3,
+      ru: { position: 'Управляющий', text: 'Виджет бронирования встроили за вечер, клиенты разобрались без объяснений. Записей стало заметно больше.' },
+      en: { position: 'Manager', text: 'The booking widget took one evening to embed and clients figured it out with no instructions. Bookings went up noticeably.' },
+    },
+    {
+      type: ReviewType.EMPLOYER,
+      authorName: 'Игорь Савельев',
+      company: 'SoftTrade',
+      rating: 5,
+      projectIndex: null,
+      ru: { position: 'Тимлид', text: 'Александр берёт задачу целиком, вместе с непонятными краями, и доводит до результата. Код читаемый, ревью проходит быстро.' },
+      en: { position: 'Team Lead', text: 'Alexander takes ownership of a task, murky edges included, and sees it through. His code is readable and reviews go quickly.' },
+    },
+    {
+      type: ReviewType.EMPLOYER,
+      authorName: 'Анна Лебедева',
+      company: 'ITL Group',
+      rating: 4,
+      projectIndex: null,
+      ru: { position: 'Руководитель разработки', text: 'Пришёл джуном, за полгода вырос до самостоятельной работы над сервисами. Не боится задавать вопросы и разбираться в чужом коде.' },
+      en: { position: 'Head of Development', text: 'Joined as a junior and within six months was running services on his own. Not afraid to ask questions or dig into unfamiliar code.' },
+    },
+  ];
+
+  for (const r of reviews) {
+    await prisma.review.create({
+      data: {
+        type: r.type,
+        authorName: r.authorName,
+        company: r.company,
+        rating: r.rating,
+        projectId: r.projectIndex !== null ? createdProjects[r.projectIndex].id : null,
+        reviewTranslations: {
+          create: [
+            { language: Language.RU, position: r.ru.position, text: r.ru.text },
+            { language: Language.EN, position: r.en.position, text: r.en.text },
+          ],
+        },
+      },
+    });
+  }
+  console.log('— отзывы');
+
+  // ---------- ТОКЕНЫ ----------
+
+  const day = 24 * 60 * 60 * 1000;
+  await prisma.reviewToken.createMany({
+    data: [
+      { type: ReviewType.CLIENT, projectId: createdProjects[0].id, isUsed: false, expiresAt: new Date(Date.now() + 30 * day) },
+      { type: ReviewType.CLIENT, projectId: createdProjects[2].id, isUsed: true, expiresAt: new Date(Date.now() + 14 * day) },
+      { type: ReviewType.EMPLOYER, projectId: null, isUsed: false, expiresAt: new Date(Date.now() + 7 * day) },
+      { type: ReviewType.EMPLOYER, projectId: null, isUsed: false, expiresAt: new Date(Date.now() - 2 * day) },
+    ],
+  });
+  console.log('— токены отзывов');
+}
+
+async function main() {
+  await wipe();
+  await seed();
+  console.log('\nГотово. Всё создано в двух языках.');
 }
 
 main()
   .catch((e) => {
-    console.error('Error during seeding:', e);
+    console.error(e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
-    await pool.end();
-  });
+  .finally(() => prisma.$disconnect());

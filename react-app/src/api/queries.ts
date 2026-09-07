@@ -1,59 +1,30 @@
 import { gql } from "urql";
+
 export const GET_PORTFOLIO_DATA = gql`
-  query GetPortfolioData {
-    profile {
+  query GetPortfolioData($lang: Language!) { # <-- СТАЛО: Language!
+    profile(lang: $lang) {
       name
       headline
       description
       location
       email
-      links {
-        kind
-        label
-        url
-        order
-      }
-      skills {
-        name
-        category
-        level
-        order
-      }
-      experience {
+      links { kind label url order }
+      skills { name category level order }
+      experience(lang: $lang) {
         company
         position
         description
         startDate
         endDate
-        achievements {
-          text
-          order
-        }
+        achievements { text order }
       }
-      projects {
-        id
-        name
-        description
-        repoUrl
-        liveUrl
-        stack
-        order
-        images {
-          url
-          order
-        }
+      projects(lang: $lang) {
+        id name description repoUrl liveUrl stack order
+        images { url order }
       }
     }
-
-    reviews {
-      id
-      type
-      authorName
-      company
-      position
-      text
-      rating
-      projectId
+    reviews(lang: $lang) {
+      id type authorName company position text rating projectId
     }
   }
 `;

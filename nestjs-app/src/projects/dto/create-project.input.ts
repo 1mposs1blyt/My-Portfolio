@@ -1,5 +1,15 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
-import { IsArray, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
+import { Language } from '../../generated/prisma/client.js';
+
 @InputType()
 export class CreateProjectInput {
   @Field()
@@ -11,13 +21,13 @@ export class CreateProjectInput {
   @IsNotEmpty()
   description: string;
   @Field({
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsUrl()
   repoUrl?: string;
   @Field({
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsUrl()
@@ -25,13 +35,17 @@ export class CreateProjectInput {
   @Field(() => [String])
   @IsArray()
   @IsString({
-    each: true
+    each: true,
   })
   stack: string[];
   @Field(() => Int, {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsInt()
   order?: number;
+  @Field(() => Language, { nullable: true, defaultValue: Language.RU })
+  @IsOptional()
+  @IsEnum(Language)
+  language?: Language;
 }

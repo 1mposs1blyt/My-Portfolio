@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, ResolveField, Parent, ID } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+  ID,
+} from '@nestjs/graphql';
 import { ProjectType, ProjectImageType } from './dto/projects.type.js';
 import { ProjectsService } from './projects.service.js';
 import { CreateProjectInput } from './dto/create-project.input.js';
@@ -7,87 +15,114 @@ import { AdminGuard } from '../admin/admin.guard.js';
 import { UpdateProjectInput } from './dto/update-project.input.js';
 import { CreateProjectImageInput } from './dto/create-project-image.input.js';
 import { UpdateProjectImageInput } from './dto/update-project-image.input.js';
+import { Language } from '../generated/prisma/client.js';
+
 @Resolver(() => ProjectType)
 export class ProjectsResolver {
   constructor(private readonly projectsService: ProjectsService) {}
-  @Query(() => [ProjectType], {
-    name: 'projects'
-  })
-  async getProjects() {
-    return this.projectsService.findAll();
+  @Query(() => [ProjectType], { name: 'projects' })
+  async getProjects(
+    @Args('lang', { type: () => Language, defaultValue: Language.RU })
+    lang: Language,
+  ) {
+    return this.projectsService.findAllWithLang(lang);
   }
   @ResolveField(() => [ProjectImageType])
-  async images(@Parent()
-  project: ProjectType) {
+  async images(
+    @Parent()
+    project: ProjectType,
+  ) {
     const dbImages = await this.projectsService.getProjectImages(project.id);
-    return dbImages.map(img => ({
+    return dbImages.map((img) => ({
       id: img.id,
       url: img.url,
-      order: Number(img.order ?? 0)
+      order: Number(img.order ?? 0),
     }));
   }
   @Mutation(() => ProjectType, {
-    name: 'createProject'
+    name: 'createProject',
   })
   @UseGuards(AdminGuard)
-  async createProject(@Args('input')
-  input: CreateProjectInput) {
+  async createProject(
+    @Args('input')
+    input: CreateProjectInput,
+  ) {
     return this.projectsService.create(input);
   }
   @Mutation(() => ProjectType, {
-    name: 'updateProject'
+    name: 'updateProject',
   })
   @UseGuards(AdminGuard)
-  async updateProject(@Args('input')
-  input: UpdateProjectInput) {
+  async updateProject(
+    @Args('input')
+    input: UpdateProjectInput,
+  ) {
     return this.projectsService.update(input);
   }
   @Mutation(() => Boolean, {
-    name: 'deleteProject'
+    name: 'deleteProject',
   })
   @UseGuards(AdminGuard)
-  async deleteProject(@Args('id', {
-    type: () => ID
-  }, ParseUUIDPipe)
-  id: string) {
+  async deleteProject(
+    @Args(
+      'id',
+      {
+        type: () => ID,
+      },
+      ParseUUIDPipe,
+    )
+    id: string,
+  ) {
     await this.projectsService.remove(id);
     return true;
   }
   @Mutation(() => ProjectImageType, {
-    name: 'addProjectImage'
+    name: 'addProjectImage',
   })
   @UseGuards(AdminGuard)
-  async addProjectImage(@Args('input')
-  input: CreateProjectImageInput) {
+  async addProjectImage(
+    @Args('input')
+    input: CreateProjectImageInput,
+  ) {
     return this.projectsService.addImage(input);
   }
   @Mutation(() => ProjectImageType, {
-    name: 'updateProjectImage'
+    name: 'updateProjectImage',
   })
   @UseGuards(AdminGuard)
-  async updateProjectImage(@Args('input')
-  input: UpdateProjectImageInput) {
+  async updateProjectImage(
+    @Args('input')
+    input: UpdateProjectImageInput,
+  ) {
     return this.projectsService.updateImage(input);
   }
   @Mutation(() => Boolean, {
-    name: 'deleteProjectImage'
+    name: 'deleteProjectImage',
   })
   @UseGuards(AdminGuard)
-  async deleteProjectImage(@Args('id', {
-    type: () => ID
-  }, ParseUUIDPipe)
-  id: string) {
+  async deleteProjectImage(
+    @Args(
+      'id',
+      {
+        type: () => ID,
+      },
+      ParseUUIDPipe,
+    )
+    id: string,
+  ) {
     await this.projectsService.removeImage(id);
     return true;
   }
   @Mutation(() => Boolean, {
-    name: 'reorderProjectImages'
+    name: 'reorderProjectImages',
   })
   @UseGuards(AdminGuard)
-  async reorderProjectImages(@Args('ids', {
-    type: () => [ID]
-  })
-  ids: string[]) {
+  async reorderProjectImages(
+    @Args('ids', {
+      type: () => [ID],
+    })
+    ids: string[],
+  ) {
     return this.projectsService.reorderImages(ids);
   }
 }

@@ -18,6 +18,13 @@ type ProjectType {
   stack: [String!]!
   order: Int!
   images: [ProjectImageType!]!
+  language: Language
+}
+
+"""Поддерживаемые языки локализации сайта"""
+enum Language {
+  RU
+  EN
 }
 
 type SkillType {
@@ -74,6 +81,11 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type ProfileCountsType {
+  projects: Int!
+  reviews: Int!
+}
+
 type ProfileType {
   id: ID!
   name: String!
@@ -81,10 +93,11 @@ type ProfileType {
   description: String!
   email: String!
   location: String
+  counts: ProfileCountsType!
   links: [ProfileLinkType!]!
   skills: [SkillType!]!
-  experience: [ExperienceType!]!
-  projects: [ProjectType!]!
+  experience(lang: Language! = RU): [ExperienceType!]!
+  projects(lang: Language! = RU): [ProjectType!]!
 }
 
 type ReviewType {
@@ -93,7 +106,7 @@ type ReviewType {
   authorName: String!
   company: String
   position: String
-  text: String!
+  text: String
   rating: Int
   projectId: String
   createdAt: DateTime!
@@ -123,15 +136,15 @@ type ReviewTokenType {
 }
 
 type Query {
-  profile: ProfileType
-  projects: [ProjectType!]!
+  profile(lang: Language! = RU): ProfileType!
+  projects(lang: Language! = RU): [ProjectType!]!
+  experience(lang: Language! = RU): [ExperienceType!]!
   skills: [SkillType!]!
   skill(id: ID!): SkillType
-  reviews: [ReviewType!]!
+  reviews(lang: Language! = RU): [ReviewType!]!
   validateReviewToken(token: String!): ReviewTokenValidType!
   reviewTokens: [ReviewTokenType!]!
   links: [ProfileLinkType!]!
-  experience: [ExperienceType!]!
 }
 
 type Mutation {
@@ -143,6 +156,9 @@ type Mutation {
   updateProjectImage(input: UpdateProjectImageInput!): ProjectImageType!
   deleteProjectImage(id: ID!): Boolean!
   reorderProjectImages(ids: [ID!]!): Boolean!
+  createExperience(input: CreateExperienceInput!): ExperienceType!
+  updateExperience(input: UpdateExperienceInput!): ExperienceType!
+  deleteExperience(id: ID!): Boolean!
   createSkill(input: CreateSkillInput!): SkillType!
   updateSkill(input: UpdateSkillInput!): SkillType!
   deleteSkill(id: ID!): SkillType!
@@ -153,9 +169,6 @@ type Mutation {
   createLink(input: CreateLinkInput!): ProfileLinkType!
   updateLink(input: UpdateLinkInput!): ProfileLinkType!
   deleteLink(id: ID!): Boolean!
-  createExperience(input: CreateExperienceInput!): ExperienceType!
-  updateExperience(input: UpdateExperienceInput!): ExperienceType!
-  deleteExperience(id: ID!): Boolean!
 }
 
 input UpdateProfileInput {
@@ -164,6 +177,7 @@ input UpdateProfileInput {
   description: String
   location: String
   email: String
+  language: Language = RU
 }
 
 input CreateProjectInput {
@@ -173,6 +187,7 @@ input CreateProjectInput {
   liveUrl: String
   stack: [String!]!
   order: Int
+  language: Language = RU
 }
 
 input UpdateProjectInput {
@@ -182,6 +197,7 @@ input UpdateProjectInput {
   liveUrl: String
   stack: [String!]
   order: Int
+  language: Language = RU
   id: ID!
 }
 
@@ -195,6 +211,28 @@ input UpdateProjectImageInput {
   id: ID!
   url: String
   order: Int
+  language: Language = RU
+}
+
+input CreateExperienceInput {
+  company: String!
+  position: String!
+  description: String
+  startDate: DateTime!
+  endDate: DateTime
+  achievements: [String!]
+  language: Language = RU
+}
+
+input UpdateExperienceInput {
+  company: String
+  position: String
+  description: String
+  startDate: DateTime
+  endDate: DateTime
+  achievements: [String!]
+  language: Language = RU
+  id: ID!
 }
 
 input CreateSkillInput {
@@ -219,6 +257,7 @@ input CreateReviewInput {
   position: String
   text: String!
   rating: Int
+  language: Language = RU
 }
 
 input CreateReviewTokenInput {
@@ -239,24 +278,5 @@ input UpdateLinkInput {
   label: String
   url: String
   order: Int
-  id: ID!
-}
-
-input CreateExperienceInput {
-  company: String!
-  position: String!
-  description: String
-  startDate: DateTime!
-  endDate: DateTime
-  achievements: [String!]
-}
-
-input UpdateExperienceInput {
-  company: String
-  position: String
-  description: String
-  startDate: DateTime
-  endDate: DateTime
-  achievements: [String!]
   id: ID!
 }

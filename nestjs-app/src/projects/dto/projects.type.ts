@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
+import { Language } from '../../generated/prisma/client.js';
 @ObjectType()
 export class ProjectImageType {
   @Field(() => ID)
@@ -19,11 +20,11 @@ export class ProjectType {
   @Field()
   description: string;
   @Field({
-    nullable: true
+    nullable: true,
   })
   repoUrl?: string;
   @Field({
-    nullable: true
+    nullable: true,
   })
   liveUrl?: string;
   @Field(() => [String])
@@ -32,4 +33,6 @@ export class ProjectType {
   order: number;
   @Field(() => [ProjectImageType])
   images: ProjectImageType[];
+@Field(() => Language, { nullable: true, defaultValue: Language.RU })
+language?: Language;
 }

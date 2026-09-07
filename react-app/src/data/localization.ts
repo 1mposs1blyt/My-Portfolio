@@ -43,7 +43,7 @@ export const getLocalization = (projectsCount: number, userName: string, userHea
       experience: "Опыт",
       contacts: "Контакты",
       reviews: "Отзывы заказчиков",
-      recommendations: "Рекомендации работодателей"
+      recommendations: "Рекомендации работодателей & Отзывы на заказы"
     },
     categories: {
       LANGUAGE: "Языки",
@@ -112,7 +112,7 @@ export const getLocalization = (projectsCount: number, userName: string, userHea
       experience: "Experience",
       contacts: "Contacts",
       reviews: "Client Reviews",
-      recommendations: "Employer Recommendations"
+      recommendations: "Employer Recommendations & Order's reviews"
     },
     categories: {
       LANGUAGE: "Languages",

@@ -8,16 +8,22 @@ import ProjectsPage from "./pages/ProjectsPage";
 import "./admin.css";
 import ReviewsPage from "./pages/ReviewsPage";
 import { ConfirmProvider } from "./ui/ConfirmProvider";
+import { AdminLangProvider } from "./AdminLangContext";
+
 export default function AdminApp() {
   const [active, setActive] = useState("profile");
-  return <ConfirmProvider>
-      <AdminShell active={active} onNavigate={setActive}>
-        {active === "profile" && <ProfilePage />}
-        {active === "skills" && <SkillsPage />}
-        {active === "links" && <ContactsPage />}
-        {active === "experience" && <ExperiencePage />}
-        {active === "projects" && <ProjectsPage />}
-        {active === "reviews" && <ReviewsPage />}
-      </AdminShell>
-    </ConfirmProvider>;
+  return (
+    <AdminLangProvider>
+      <ConfirmProvider>
+        <AdminShell active={active} onNavigate={setActive}>
+          {active === "profile" && <ProfilePage />}
+          {active === "skills" && <SkillsPage />}
+          {active === "links" && <ContactsPage />}
+          {active === "experience" && <ExperiencePage />}
+          {active === "projects" && <ProjectsPage />}
+          {active === "reviews" && <ReviewsPage />}
+        </AdminShell>
+      </ConfirmProvider>
+    </AdminLangProvider>
+  );
 }

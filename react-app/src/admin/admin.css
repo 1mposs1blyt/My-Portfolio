@@ -440,9 +440,13 @@
 }
 .adm-review header {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  align-items: center;
   flex-wrap: wrap;
+  gap: 8px;
+}
+.adm-review header .adm-del {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 .adm-review header strong {
   color: #f4f1fa;
@@ -496,4 +500,10 @@
 .adm-btn-danger:hover:not(:disabled) {
   background: #ff5cb5;
   border-color: #ff5cb5;
+}
+.adm-side-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }

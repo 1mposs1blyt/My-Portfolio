@@ -1,56 +1,45 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
-import { ProfileType } from './dto/profile.type.js';
-import { UpdateProfileInput } from './dto/update-profile.input.js';
+import { Resolver, Query, Args, ResolveField, Parent, Mutation } from '@nestjs/graphql';
 import { ProfileService } from './profile.service.js';
-import { AdminGuard } from '../admin/admin.guard.js';
-import { PrismaService } from '../common/prisma/prisma.service.js';
+import { ProfileType, ExperienceType } from './dto/profile.type.js';
+import { ProjectsService } from '../projects/projects.service.js';
+import { ProjectType } from '../projects/dto/projects.type.js';
+import { ExperienceService } from '../experience/experience.service.js';
+import { Language } from '../generated/prisma/client.js';
+import { UpdateProfileInput } from './dto/update-profile.input.js';
+
 @Resolver(() => ProfileType)
 export class ProfileResolver {
-  constructor(private readonly prisma: PrismaService, private readonly profileService: ProfileService) {}
-  @Query(() => ProfileType, {
-    name: 'profile',
-    nullable: true
-  })
-  async getProfile() {
-    return this.prisma.profile.findFirst({
-      include: {
-        links: {
-          orderBy: {
-            order: 'asc'
-          }
-        },
-        skills: {
-          orderBy: {
-            order: 'asc'
-          }
-        },
-        experience: {
-          orderBy: {
-            startDate: 'desc'
-          },
-          include: {
-            achievements: {
-              orderBy: {
-                order: 'asc'
-              }
-            }
-          }
-        },
-        projects: {
-          orderBy: {
-            order: 'asc'
-          }
-        }
-      }
-    });
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly projectsService: ProjectsService,
+    private readonly experienceService: ExperienceService,
+  ) {}
+
+  @Query(() => ProfileType, { name: 'profile' })
+  async getProfile(
+    @Args('lang', { type: () => Language, defaultValue: Language.RU }) lang: Language,
+  ) {
+    return this.profileService.findOneWithLang(lang);
   }
-  @Mutation(() => ProfileType, {
-    name: 'updateProfile'
-  })
-  @UseGuards(AdminGuard)
-  async updateProfile(@Args('input')
-  input: UpdateProfileInput) {
+
+  @ResolveField(() => [ProjectType], { name: 'projects' })
+  async getProjects(
+    @Parent() profile: ProfileType,
+    @Args('lang', { type: () => Language, defaultValue: Language.RU }) lang: Language,
+  ) {
+    return (this.projectsService as any).findByProfileId(profile.id, lang);
+  }
+
+  @ResolveField(() => [ExperienceType], { name: 'experience' })
+  async getExperience(
+    @Parent() profile: ProfileType,
+    @Args('lang', { type: () => Language, defaultValue: Language.RU }) lang: Language,
+  ) {
+    return (this.experienceService as any).findByProfileId(profile.id, lang);
+  }
+
+  @Mutation(() => ProfileType, { name: 'updateProfile' })
+  async updateProfile(@Args('input') input: UpdateProfileInput) {
     return this.profileService.update(input);
   }
 }

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useMutation, useQuery } from "urql";
+import { useAdminLang } from "../AdminLangContext";
 import { ADMIN_PROFILE_QUERY, UPDATE_PROFILE_MUTATION } from "../api/api.js";
-import { useAdminToken } from "../hooks/useAdminToken.js";
-import { DEMO_PROFILE } from "../demo/fixtures.js";
+
 type ProfileForm = {
   name: string;
   headline: string;
@@ -10,73 +10,70 @@ type ProfileForm = {
   location: string;
   email: string;
 };
+
 const EMPTY: ProfileForm = {
   name: "",
   headline: "",
   description: "",
   location: "",
-  email: ""
+  email: "",
 };
+
 export default function ProfilePage() {
-  const {
-    isEditor
-  } = useAdminToken();
-  const [{
-    data,
-    fetching,
-    error
-  }] = useQuery({
-    query: ADMIN_PROFILE_QUERY
+  const { lang } = useAdminLang();
+  
+  const [{ data, fetching, error }] = useQuery({
+    query: ADMIN_PROFILE_QUERY,
+    variables: { lang: lang },
+    requestPolicy: "network-only",
   });
+
   const [, updateProfile] = useMutation(UPDATE_PROFILE_MUTATION);
   const [form, setForm] = useState<ProfileForm>(EMPTY);
-  const [loaded, setLoaded] = useState(false);
   const [status, setStatus] = useState<{
     kind: "ok" | "err";
     text: string;
   } | null>(null);
   const [saving, setSaving] = useState(false);
   useEffect(() => {
-    if (loaded) return;
-    const p = isEditor ? data?.profile : DEMO_PROFILE;
-    if (!p) return;
+    setForm(EMPTY);
+  }, [lang]);
+
+  useEffect(() => {
+    if (!data?.profile) return;
+    const p = data.profile;
+
     setForm({
       name: p.name ?? "",
       headline: p.headline ?? "",
       description: p.description ?? "",
       location: p.location ?? "",
-      email: p.email ?? ""
+      email: p.email ?? "",
     });
-    setLoaded(true);
-  }, [data, loaded, isEditor]);
-  useEffect(() => {
-    setLoaded(false);
-  }, [isEditor]);
+  }, [data]);
+
   const field = (key: keyof ProfileForm) => ({
     value: form[key],
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setForm(f => ({
+    onChange: (
+      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+      setForm((f) => ({
         ...f,
-        [key]: e.target.value
+        [key]: e.target.value,
       }));
       setStatus(null);
-    }
+    },
   });
+
   const save = async () => {
     if (!form.name.trim() || !form.email.trim()) {
       setStatus({
         kind: "err",
-        text: "Имя и почта обязательны"
+        text: "Имя и почта обязательны",
       });
       return;
     }
-    if (!isEditor) {
-      setStatus({
-        kind: "ok",
-        text: "Демо-режим: изменения не сохранены"
-      });
-      return;
-    }
+
     setSaving(true);
     const res = await updateProfile({
       input: {
@@ -84,22 +81,43 @@ export default function ProfilePage() {
         headline: form.headline,
         description: form.description,
         location: form.location || null,
-        email: form.email
-      }
+        email: form.email,
+        language: lang,
+      },
     });
     setSaving(false);
-    setStatus(res.error ? {
-      kind: "err",
-      text: res.error.message.replace("[GraphQL] ", "")
-    } : {
-      kind: "ok",
-      text: "Сохранено"
-    });
+
+    setStatus(
+      res.error
+        ? {
+            kind: "err",
+            text: res.error.message.replace("[GraphQL] ", ""),
+          }
+        : {
+            kind: "ok",
+            text: "Успешно сохранено в базу данных",
+          },
+    );
   };
-  if (fetching && !loaded) return <div className="adm-page adm-hint">Загрузка…</div>;
+
+  if (fetching && !data)
+    return <div className="adm-page adm-hint">Загрузка…</div>;
   if (error) return <div className="adm-page adm-error">{error.message}</div>;
-  return <div className="adm-page">
-      <h1 className="adm-h1">Профиль</h1>
+
+  return (
+    <div className="adm-page">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "2rem",
+        }}
+      >
+        <h1 className="adm-h1" style={{ margin: 0 }}>
+          Профиль
+        </h1>
+      </div>
 
       <div className="adm-field">
         <label htmlFor="p-name">Имя</label>
@@ -108,7 +126,11 @@ export default function ProfilePage() {
 
       <div className="adm-field">
         <label htmlFor="p-headline">Заголовок</label>
-        <input id="p-headline" {...field("headline")} placeholder="Full-stack разработчик" />
+        <input
+          id="p-headline"
+          {...field("headline")}
+          placeholder="Full-stack разработчик"
+        />
       </div>
 
       <div className="adm-field">
@@ -127,12 +149,19 @@ export default function ProfilePage() {
       </div>
 
       <div className="adm-actions">
-        <button className="adm-btn adm-btn-main" onClick={save} disabled={saving}>
+        <button
+          className="adm-btn adm-btn-main"
+          onClick={save}
+          disabled={saving}
+        >
           {saving ? "Сохраняю…" : "Сохранить"}
         </button>
-        {status && <span className={status.kind === "err" ? "adm-error" : "adm-hint"}>
+        {status && (
+          <span className={status.kind === "err" ? "adm-error" : "adm-hint"}>
             {status.text}
-          </span>}
+          </span>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 }

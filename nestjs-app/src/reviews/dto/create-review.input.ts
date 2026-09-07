@@ -1,5 +1,15 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
+import {
+    IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
+import { Language } from '../../generated/prisma/client.js';
 
 @InputType()
 export class CreateReviewInput {
@@ -10,6 +20,13 @@ export class CreateReviewInput {
   @Field() @IsString() @IsNotEmpty() text: string;
 
   @Field(() => Int, { nullable: true })
-  @IsOptional() @IsInt() @Min(1) @Max(5)
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
   rating?: number;
+  @Field(() => Language, { nullable: true, defaultValue: Language.RU })
+  @IsOptional()
+  @IsEnum(Language)
+  language?: Language;
 }

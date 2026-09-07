@@ -1,6 +1,7 @@
 import { useConfirm } from "../ui/ConfirmProvider";
 import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "urql";
+import { useAdminLang } from "../AdminLangContext";
 import {
   ADD_PROJECT_IMAGE_MUTATION,
   ADMIN_PROJECTS_QUERY,
@@ -40,10 +41,13 @@ const blank = (order: number): Project => ({
 });
 const src = (url: string) => (url.startsWith("http") ? url : API_ORIGIN + url);
 export default function ProjectsPage() {
+  const { lang } = useAdminLang();
   const confirm = useConfirm();
   const { isEditor } = useAdminToken();
   const [{ data, fetching, error }] = useQuery({
     query: ADMIN_PROJECTS_QUERY,
+    variables: { lang },
+    requestPolicy: "network-only",
   });
   const [stackText, setStackText] = useState<Record<string, string>>({});
   const [, createProject] = useMutation(CREATE_PROJECT_MUTATION);
@@ -59,7 +63,6 @@ export default function ProjectsPage() {
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
   useEffect(() => {
-    if (loaded) return;
     const source = isEditor ? data?.profile?.projects : DEMO_PROJECTS;
     if (!source) return;
     setItems(
@@ -76,10 +79,10 @@ export default function ProjectsPage() {
       ),
     );
     setLoaded(true);
-  }, [data, loaded, isEditor]);
+  }, [data, isEditor]);
   useEffect(() => {
     setLoaded(false);
-  }, [isEditor]);
+  }, [isEditor, lang]);
   const say = (text: string) => {
     setStatus(text);
     window.setTimeout(() => setStatus(null), 3000);
@@ -89,9 +92,9 @@ export default function ProjectsPage() {
       list.map((p) =>
         p.id === id
           ? {
-            ...p,
-            ...changes,
-          }
+              ...p,
+              ...changes,
+            }
           : p,
       ),
     );
@@ -113,6 +116,7 @@ export default function ProjectsPage() {
       liveUrl: item.liveUrl || null,
       stack,
       order: item.order,
+      language: lang,
     };
 
     if (!isEditor) {

@@ -1,6 +1,15 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsArray, IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDate,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Type } from 'class-transformer';
+import { Language } from '../../generated/prisma/client.js';
+
 @InputType()
 export class CreateExperienceInput {
   @Field()
@@ -12,7 +21,7 @@ export class CreateExperienceInput {
   @IsNotEmpty()
   position: string;
   @Field({
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsString()
@@ -22,19 +31,24 @@ export class CreateExperienceInput {
   @IsDate()
   startDate: Date;
   @Field(() => Date, {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @Type(() => Date)
   @IsDate()
   endDate?: Date;
   @Field(() => [String], {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsArray()
   @IsString({
-    each: true
+    each: true,
   })
   achievements?: string[];
+
+  @Field(() => Language, { nullable: true, defaultValue: Language.RU })
+  @IsOptional()
+  @IsEnum(Language)
+  language?: Language;
 }
