@@ -925,6 +925,33 @@ async function seed() {
       },
     },
   });
+  await prisma.project.create({
+    data: {
+      id: "a1b2c3d4-0000-4000-8000-000000000012",
+      profileId: profile.id,
+      repoUrl: "https://github.com/1mposs1blyt/einsteinbot",
+      liveUrl: null,
+      stack: ["Node.js", "Telegram Bot API", "SQLite"],
+      order: 11,
+      projectTranslations: {
+        create: [
+          {
+            language: Language.RU,
+            name: "EinsteinBot — подбор программ обучения",
+            description:
+              "Телеграм-бот для школы ментальной арифметики «Эйн&Штейн»: подбирает программу по возрасту и уровню ученика, показывает расписание и передаёт заявку администратору. Дополняет веб-платформу — первый контакт с родителем происходит в мессенджере, без звонков.",
+          },
+          {
+            language: Language.EN,
+            name: "EinsteinBot — course matching bot",
+            description:
+              "A Telegram bot for the Ein&Stein mental arithmetic school: matches a programme to the student's age and level, shows the schedule and forwards the enquiry to an administrator. It complements the web platform — the first contact with a parent happens in the messenger, with no phone calls.",
+          },
+        ],
+      },
+      images: { create: [] },
+    },
+  });
   console.log("— проекты и изображения");
 }
 
