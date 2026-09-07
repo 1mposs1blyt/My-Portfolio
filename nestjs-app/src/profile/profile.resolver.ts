@@ -6,7 +6,8 @@ import { ProjectType } from '../projects/dto/projects.type.js';
 import { ExperienceService } from '../experience/experience.service.js';
 import { Language } from '../generated/prisma/client.js';
 import { UpdateProfileInput } from './dto/update-profile.input.js';
-
+import { UseGuards } from '@nestjs/common';
+import { AdminGuard } from '../admin/admin.guard.js';
 @Resolver(() => ProfileType)
 export class ProfileResolver {
   constructor(
@@ -27,7 +28,7 @@ export class ProfileResolver {
     @Parent() profile: ProfileType,
     @Args('lang', { type: () => Language, defaultValue: Language.RU }) lang: Language,
   ) {
-    return (this.projectsService as any).findByProfileId(profile.id, lang);
+    return this.projectsService.findByProfileId(profile.id, lang);
   }
 
   @ResolveField(() => [ExperienceType], { name: 'experience' })
@@ -35,10 +36,11 @@ export class ProfileResolver {
     @Parent() profile: ProfileType,
     @Args('lang', { type: () => Language, defaultValue: Language.RU }) lang: Language,
   ) {
-    return (this.experienceService as any).findByProfileId(profile.id, lang);
+    return this.experienceService.findByProfileId(profile.id, lang);
   }
 
   @Mutation(() => ProfileType, { name: 'updateProfile' })
+  @UseGuards(AdminGuard)
   async updateProfile(@Args('input') input: UpdateProfileInput) {
     return this.profileService.update(input);
   }
