@@ -9,35 +9,45 @@ import { AdminGuard } from '../admin/admin.guard.js';
 export class LinksResolver {
   constructor(private readonly linksService: LinksService) {}
   @Query(() => [ProfileLinkType], {
-    name: 'links'
+    name: 'links',
   })
   async getLinks() {
     return this.linksService.findAll();
   }
   @Mutation(() => ProfileLinkType, {
-    name: 'createLink'
+    name: 'createLink',
   })
   @UseGuards(AdminGuard)
-  async createLink(@Args('input')
-  input: CreateLinkInput) {
+  async createLink(
+    @Args('input')
+    input: CreateLinkInput,
+  ) {
     return this.linksService.create(input);
   }
   @Mutation(() => ProfileLinkType, {
-    name: 'updateLink'
+    name: 'updateLink',
   })
   @UseGuards(AdminGuard)
-  async updateLink(@Args('input')
-  input: UpdateLinkInput) {
+  async updateLink(
+    @Args('input')
+    input: UpdateLinkInput,
+  ) {
     return this.linksService.update(input);
   }
   @Mutation(() => Boolean, {
-    name: 'deleteLink'
+    name: 'deleteLink',
   })
   @UseGuards(AdminGuard)
-  async deleteLink(@Args('id', {
-    type: () => ID
-  }, ParseUUIDPipe)
-  id: string) {
+  async deleteLink(
+    @Args(
+      'id',
+      {
+        type: () => ID,
+      },
+      ParseUUIDPipe,
+    )
+    id: string,
+  ) {
     await this.linksService.remove(id);
     return true;
   }

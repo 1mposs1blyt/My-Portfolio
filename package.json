@@ -5,7 +5,7 @@
     "dev": "concurrently -n api,web,studio -c magenta,cyan,blue \"npm:dev:api\" \"npm:dev:web\" \"npm:dev:prisma\"",
     "dev:api": "npm --prefix nestjs-app run start:dev",
     "dev:web": "npm --prefix react-app run dev",
-    "dev:prisma":"npm --prefix nestjs-app run db:studio",
+    "dev:prisma": "npm --prefix nestjs-app run db:studio",
     "install:all": "npm install && npm --prefix nestjs-app install && npm --prefix react-app install",
     "build": "npm --prefix nestjs-app run build && npm --prefix react-app run build",
     "up": "docker compose up --build",

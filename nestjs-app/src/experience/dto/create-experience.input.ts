@@ -9,7 +9,6 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Language } from '../../generated/prisma/client.js';
-
 @InputType()
 export class CreateExperienceInput {
   @Field()
@@ -46,8 +45,10 @@ export class CreateExperienceInput {
     each: true,
   })
   achievements?: string[];
-
-  @Field(() => Language, { nullable: true, defaultValue: Language.RU })
+  @Field(() => Language, {
+    nullable: true,
+    defaultValue: Language.RU,
+  })
   @IsOptional()
   @IsEnum(Language)
   language?: Language;

@@ -16,13 +16,17 @@ import { UpdateProjectInput } from './dto/update-project.input.js';
 import { CreateProjectImageInput } from './dto/create-project-image.input.js';
 import { UpdateProjectImageInput } from './dto/update-project-image.input.js';
 import { Language } from '../generated/prisma/client.js';
-
 @Resolver(() => ProjectType)
 export class ProjectsResolver {
   constructor(private readonly projectsService: ProjectsService) {}
-  @Query(() => [ProjectType], { name: 'projects' })
+  @Query(() => [ProjectType], {
+    name: 'projects',
+  })
   async getProjects(
-    @Args('lang', { type: () => Language, defaultValue: Language.RU })
+    @Args('lang', {
+      type: () => Language,
+      defaultValue: Language.RU,
+    })
     lang: Language,
   ) {
     return this.projectsService.findAllWithLang(lang);

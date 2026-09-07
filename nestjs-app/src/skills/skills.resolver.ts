@@ -9,43 +9,51 @@ import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator.j
 export class SkillsResolver {
   constructor(private readonly skillsService: SkillsService) {}
   @Query(() => [SkillType], {
-    name: 'skills'
+    name: 'skills',
   })
   async getSkills() {
     return this.skillsService.findAll();
   }
   @Query(() => SkillType, {
     name: 'skill',
-    nullable: true
+    nullable: true,
   })
-  async getSkill(@Args('id', {
-    type: () => ID
-  })
-  id: string) {
+  async getSkill(
+    @Args('id', {
+      type: () => ID,
+    })
+    id: string,
+  ) {
     return this.skillsService.findOne(id);
   }
   @Mutation(() => SkillType, {
-    name: 'createSkill'
+    name: 'createSkill',
   })
-  async createSkill(@Args('input')
-  input: CreateSkillInput) {
+  async createSkill(
+    @Args('input')
+    input: CreateSkillInput,
+  ) {
     return this.skillsService.create(input);
   }
   @Mutation(() => SkillType, {
-    name: 'updateSkill'
+    name: 'updateSkill',
   })
   @UseGuards(AdminGuard)
-  async updateSkill(@Args('input')
-  input: UpdateSkillInput) {
+  async updateSkill(
+    @Args('input')
+    input: UpdateSkillInput,
+  ) {
     return this.skillsService.update(input);
   }
   @Mutation(() => SkillType, {
-    name: 'deleteSkill'
+    name: 'deleteSkill',
   })
-  async deleteSkill(@Args('id', {
-    type: () => ID
-  })
-  id: string) {
+  async deleteSkill(
+    @Args('id', {
+      type: () => ID,
+    })
+    id: string,
+  ) {
     return this.skillsService.remove(id);
   }
 }

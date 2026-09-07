@@ -45,12 +45,16 @@ export default function ReviewsPage() {
   const { isEditor } = useAdminToken();
   const [{ data: reviewsData, fetching, error: reviewsError }] = useQuery({
     query: ADMIN_REVIEWS_QUERY,
-    variables: { lang },
+    variables: {
+      lang,
+    },
     requestPolicy: "network-only",
   });
   const [{ data: projectsData }] = useQuery({
     query: ADMIN_PROJECTS_LIGHT_QUERY,
-    variables: { lang },
+    variables: {
+      lang,
+    },
   });
   const [{ data: tokensData }, refetchTokens] = useQuery({
     query: ADMIN_REVIEW_TOKENS_QUERY,
@@ -84,7 +88,7 @@ export default function ReviewsPage() {
   };
   const copy = async (id: string) => {
     const link = linkFor(id);
-    setFresh(id);                        // поле внизу тоже обновится
+    setFresh(id);
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(link);
@@ -178,7 +182,7 @@ export default function ReviewsPage() {
     <div className="adm-page adm-page-wide">
       <h1 className="adm-h1">Отзывы</h1>
 
-      { }
+      {}
       <section className="adm-card">
         <h2 className="adm-h2">Новая ссылка</h2>
 
@@ -259,7 +263,7 @@ export default function ReviewsPage() {
         )}
       </section>
 
-      { }
+      {}
       <section className="adm-card">
         <h2 className="adm-h2">
           Выданные ссылки <span className="adm-count">{tokens.length}</span>
@@ -319,7 +323,7 @@ export default function ReviewsPage() {
         )}
       </section>
 
-      { }
+      {}
       <section className="adm-card">
         <h2 className="adm-h2">
           Полученные <span className="adm-count">{reviews.length}</span>

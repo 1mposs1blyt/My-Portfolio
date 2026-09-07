@@ -37,15 +37,15 @@ const blank = (): Experience => ({
 });
 export default function ExperiencePage() {
   const { lang } = useAdminLang();
-
   const confirm = useConfirm();
   const { isEditor } = useAdminToken();
   const [{ data, fetching, error }] = useQuery({
-    query: ADMIN_EXPERIENCE_QUERY, // или ADMIN_PROJECTS_QUERY
-    variables: { lang },
+    query: ADMIN_EXPERIENCE_QUERY,
+    variables: {
+      lang,
+    },
     requestPolicy: "network-only",
   });
-
   const [, createExperience] = useMutation(CREATE_EXPERIENCE_MUTATION);
   const [, updateExperience] = useMutation(UPDATE_EXPERIENCE_MUTATION);
   const [, deleteExperience] = useMutation(DELETE_EXPERIENCE_MUTATION);
@@ -163,7 +163,7 @@ export default function ExperiencePage() {
       startDate: item.startDate,
       endDate: item.endDate || null,
       achievements,
-      language: lang
+      language: lang,
     };
     if (!isEditor) {
       say("Демо-режим: не сохранено");

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useMutation, useQuery } from "urql";
 import { useAdminLang } from "../AdminLangContext";
 import { ADMIN_PROFILE_QUERY, UPDATE_PROFILE_MUTATION } from "../api/api.js";
-
 type ProfileForm = {
   name: string;
   headline: string;
@@ -10,7 +9,6 @@ type ProfileForm = {
   location: string;
   email: string;
 };
-
 const EMPTY: ProfileForm = {
   name: "",
   headline: "",
@@ -18,16 +16,15 @@ const EMPTY: ProfileForm = {
   location: "",
   email: "",
 };
-
 export default function ProfilePage() {
   const { lang } = useAdminLang();
-  
   const [{ data, fetching, error }] = useQuery({
     query: ADMIN_PROFILE_QUERY,
-    variables: { lang: lang },
+    variables: {
+      lang: lang,
+    },
     requestPolicy: "network-only",
   });
-
   const [, updateProfile] = useMutation(UPDATE_PROFILE_MUTATION);
   const [form, setForm] = useState<ProfileForm>(EMPTY);
   const [status, setStatus] = useState<{
@@ -38,11 +35,9 @@ export default function ProfilePage() {
   useEffect(() => {
     setForm(EMPTY);
   }, [lang]);
-
   useEffect(() => {
     if (!data?.profile) return;
     const p = data.profile;
-
     setForm({
       name: p.name ?? "",
       headline: p.headline ?? "",
@@ -51,7 +46,6 @@ export default function ProfilePage() {
       email: p.email ?? "",
     });
   }, [data]);
-
   const field = (key: keyof ProfileForm) => ({
     value: form[key],
     onChange: (
@@ -64,7 +58,6 @@ export default function ProfilePage() {
       setStatus(null);
     },
   });
-
   const save = async () => {
     if (!form.name.trim() || !form.email.trim()) {
       setStatus({
@@ -73,7 +66,6 @@ export default function ProfilePage() {
       });
       return;
     }
-
     setSaving(true);
     const res = await updateProfile({
       input: {
@@ -86,7 +78,6 @@ export default function ProfilePage() {
       },
     });
     setSaving(false);
-
     setStatus(
       res.error
         ? {
@@ -99,11 +90,9 @@ export default function ProfilePage() {
           },
     );
   };
-
   if (fetching && !data)
     return <div className="adm-page adm-hint">Загрузка…</div>;
   if (error) return <div className="adm-page adm-error">{error.message}</div>;
-
   return (
     <div className="adm-page">
       <div
@@ -114,7 +103,12 @@ export default function ProfilePage() {
           marginBottom: "2rem",
         }}
       >
-        <h1 className="adm-h1" style={{ margin: 0 }}>
+        <h1
+          className="adm-h1"
+          style={{
+            margin: 0,
+          }}
+        >
           Профиль
         </h1>
       </div>

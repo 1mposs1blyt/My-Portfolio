@@ -7,7 +7,6 @@ import { CreateProjectImageInput } from './dto/create-project-image.input.js';
 import { UpdateProjectImageInput } from './dto/update-project-image.input.js';
 import { unlink } from 'fs/promises';
 import { join } from 'path';
-
 @Injectable()
 export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -31,10 +30,20 @@ export class ProjectsService {
   }
   async findOneWithLang(id: string, lang: Language) {
     const project = await this.prisma.project.findUnique({
-      where: { id },
+      where: {
+        id,
+      },
       include: {
-        projectTranslations: { where: { language: lang } },
-        images: { orderBy: { order: 'asc' } },
+        projectTranslations: {
+          where: {
+            language: lang,
+          },
+        },
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     });
     if (!project) throw new NotFoundException('Проект не найден');
@@ -42,16 +51,25 @@ export class ProjectsService {
   }
   async findByProfileId(profileId: string, lang: Language) {
     const projects = await this.prisma.project.findMany({
-      where: { profileId },
-      orderBy: { order: 'asc' },
+      where: {
+        profileId,
+      },
+      orderBy: {
+        order: 'asc',
+      },
       include: {
         projectTranslations: {
-          where: { language: lang },
+          where: {
+            language: lang,
+          },
         },
-        images: { orderBy: { order: 'asc' } },
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     });
-
     return projects.map((project) => {
       const translation = project.projectTranslations[0];
       return {
@@ -66,13 +84,13 @@ export class ProjectsService {
       };
     });
   }
-
   async update(input: UpdateProjectInput) {
     const { id, name, description, language, ...data } = input as any;
     const lang = language ?? Language.RU;
-
     await this.prisma.project.update({
-      where: { id },
+      where: {
+        id,
+      },
       data: {
         ...data,
         ...(name !== undefined || description !== undefined
@@ -80,7 +98,10 @@ export class ProjectsService {
               projectTranslations: {
                 upsert: {
                   where: {
-                    projectId_language: { projectId: id, language: lang },
+                    projectId_language: {
+                      projectId: id,
+                      language: lang,
+                    },
                   },
                   create: {
                     language: lang,
@@ -88,8 +109,12 @@ export class ProjectsService {
                     description: description ?? '',
                   },
                   update: {
-                    ...(name !== undefined && { name }),
-                    ...(description !== undefined && { description }),
+                    ...(name !== undefined && {
+                      name,
+                    }),
+                    ...(description !== undefined && {
+                      description,
+                    }),
                   },
                 },
               },
@@ -99,23 +124,26 @@ export class ProjectsService {
     });
     return this.findOneWithLang(id, lang);
   }
-
   async create(input: CreateProjectInput) {
     const profile = await this.prisma.profile.findFirst();
     if (!profile) throw new NotFoundException('Профиль не найден');
     const { name, description, language, ...data } = input;
     const lang = language ?? Language.RU;
-
     const project = await this.prisma.project.create({
       data: {
         ...data,
         profileId: profile.id,
-        projectTranslations: { create: { language: lang, name, description } },
+        projectTranslations: {
+          create: {
+            language: lang,
+            name,
+            description,
+          },
+        },
       },
     });
     return this.findOneWithLang(project.id, lang);
   }
-
   async getProjectImages(projectId: string) {
     return this.prisma.projectImage.findMany({
       where: {
@@ -126,7 +154,6 @@ export class ProjectsService {
       },
     });
   }
-
   async remove(id: string) {
     try {
       await this.prisma.project.delete({
@@ -144,7 +171,6 @@ export class ProjectsService {
       throw e;
     }
   }
-
   async addImage(input: CreateProjectImageInput) {
     const { projectId, order, ...rest } = input;
     const project = await this.prisma.project.findUnique({
@@ -173,7 +199,6 @@ export class ProjectsService {
       },
     });
   }
-
   async updateImage(input: UpdateProjectImageInput) {
     const { id, ...data } = input;
     const image = await this.prisma.projectImage.findUnique({
@@ -189,7 +214,6 @@ export class ProjectsService {
       data,
     });
   }
-
   async removeImage(id: string) {
     const image = await this.prisma.projectImage.findUnique({
       where: {
@@ -206,7 +230,6 @@ export class ProjectsService {
       await unlink(join(process.cwd(), image.url)).catch(() => {});
     }
   }
-
   async reorderImages(ids: string[]) {
     await this.prisma.$transaction(
       ids.map((id, index) =>

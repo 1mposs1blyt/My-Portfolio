@@ -1,6 +1,5 @@
 import React from "react";
 import SectionHeader from "../ui/SectionHeader";
-
 type AboutSectionProps = {
   t: any;
   profile: {
@@ -9,7 +8,6 @@ type AboutSectionProps = {
     email?: string | null;
   } | null;
 };
-
 export default function AboutSection({ t, profile }: AboutSectionProps) {
   return (
     <section className="b-section" data-section="about">

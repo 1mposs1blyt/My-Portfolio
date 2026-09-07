@@ -1,7 +1,7 @@
 import { ObjectType, Field, ID, Int, registerEnumType } from '@nestjs/graphql';
 import { SkillCategory } from '../../generated/prisma/client.js';
 registerEnumType(SkillCategory, {
-  name: 'SkillCategory'
+  name: 'SkillCategory',
 });
 @ObjectType()
 export class SkillType {

@@ -1,5 +1,11 @@
 import { InputType, Field, ID, Int } from '@nestjs/graphql';
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 @InputType()
 export class CreateProjectImageInput {
   @Field(() => ID)
@@ -10,7 +16,7 @@ export class CreateProjectImageInput {
   @IsNotEmpty()
   url: string;
   @Field(() => Int, {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsInt()

@@ -4,6 +4,6 @@ import { ReviewsResolver } from './reviews.resolver.js';
 import { PrismaService } from '../common/prisma/prisma.service.js';
 @Module({
   providers: [ReviewsService, ReviewsResolver, PrismaService],
-  exports: [ReviewsService]
+  exports: [ReviewsService],
 })
 export class ReviewsModule {}

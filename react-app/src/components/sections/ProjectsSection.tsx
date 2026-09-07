@@ -10,12 +10,16 @@ interface ProjectsSectionProps {
 export default function ProjectsSection({
   t,
   projects,
-  onOpenGallery
+  onOpenGallery,
 }: ProjectsSectionProps) {
-  return <section className="b-section" data-section="projects">
+  return (
+    <section className="b-section" data-section="projects">
       <SectionHeader fileName="projects/" title={t.headings.projects} />
       <div className="b-grid">
-        {projects.map(p => <ProjectCard key={p.id} p={p} t={t} onOpen={onOpenGallery} />)}
+        {projects.map((p) => (
+          <ProjectCard key={p.id} p={p} t={t} onOpen={onOpenGallery} />
+        ))}
       </div>
-    </section>;
+    </section>
+  );
 }

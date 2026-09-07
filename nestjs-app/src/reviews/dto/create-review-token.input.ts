@@ -7,13 +7,13 @@ export class CreateReviewTokenInput {
   @IsEnum(ReviewKind)
   type: ReviewKind;
   @Field(() => ID, {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsUUID()
   projectId?: string;
   @Field(() => Int, {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsInt()

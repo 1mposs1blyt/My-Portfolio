@@ -8,15 +8,15 @@ export class LinksService {
   async findAll() {
     return this.prisma.profileLink.findMany({
       orderBy: {
-        order: 'asc'
-      }
+        order: 'asc',
+      },
     });
   }
   async findOne(id: string) {
     const link = await this.prisma.profileLink.findUnique({
       where: {
-        id
-      }
+        id,
+      },
     });
     if (!link) throw new NotFoundException(`Link with ID:${id} not found`);
     return link;
@@ -27,29 +27,26 @@ export class LinksService {
     return this.prisma.profileLink.create({
       data: {
         ...input,
-        profileId: profile.id
-      }
+        profileId: profile.id,
+      },
     });
   }
   async update(input: UpdateLinkInput) {
-    const {
-      id,
-      ...data
-    } = input;
+    const { id, ...data } = input;
     await this.findOne(id);
     return this.prisma.profileLink.update({
       where: {
-        id
+        id,
       },
-      data
+      data,
     });
   }
   async remove(id: string) {
     await this.findOne(id);
     await this.prisma.profileLink.delete({
       where: {
-        id
-      }
+        id,
+      },
     });
   }
 }

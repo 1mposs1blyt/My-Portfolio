@@ -11,7 +11,12 @@ describe('Локализация RU/EN (e2e)', () => {
   let http: any;
 
   // то, что создадим сами и в конце уберём
-  const created = { projectId: '', experienceId: '', reviewId: '', tokenId: '' };
+  const created = {
+    projectId: '',
+    experienceId: '',
+    reviewId: '',
+    tokenId: '',
+  };
   // чтобы вернуть профиль в исходное состояние
   let originalProfile: { ru: any; en: any };
 
@@ -36,14 +41,20 @@ describe('Локализация RU/EN (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     // те же пайпы, что в main.ts — иначе whitelist не проверится
-    app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ transform: true, whitelist: true }),
+    );
     await app.init();
     http = request(app.getHttpServer());
 
     // запоминаем профиль, чтобы восстановить после тестов мутаций
     const [ru, en] = await Promise.all([
-      gql(`query { profile(lang: RU) { name headline description location email } }`),
-      gql(`query { profile(lang: EN) { name headline description location email } }`),
+      gql(
+        `query { profile(lang: RU) { name headline description location email } }`,
+      ),
+      gql(
+        `query { profile(lang: EN) { name headline description location email } }`,
+      ),
     ]);
     originalProfile = { ru: ru.body.data.profile, en: en.body.data.profile };
   });
@@ -127,8 +138,12 @@ describe('Локализация RU/EN (e2e)', () => {
 
     it('нелокализованные поля одинаковы на обоих языках', async () => {
       const [ru, en] = await Promise.all([
-        gql(`query { profile(lang: RU) { email links { url } skills { name } } }`),
-        gql(`query { profile(lang: EN) { email links { url } skills { name } } }`),
+        gql(
+          `query { profile(lang: RU) { email links { url } skills { name } } }`,
+        ),
+        gql(
+          `query { profile(lang: EN) { email links { url } skills { name } } }`,
+        ),
       ]);
       expect(ru.body.data.profile.email).toBe(en.body.data.profile.email);
       expect(ru.body.data.profile.links).toEqual(en.body.data.profile.links);
@@ -482,7 +497,9 @@ describe('Локализация RU/EN (e2e)', () => {
       ]);
 
       const findIt = (r: any) =>
-        r.body.data.profile.projects.find((p: any) => p.id === created.projectId);
+        r.body.data.profile.projects.find(
+          (p: any) => p.id === created.projectId,
+        );
 
       expect(findIt(ru).name).toBe('Тестовый проект');
       expect(findIt(en).name).toBe('E2E Project'); // английский на месте

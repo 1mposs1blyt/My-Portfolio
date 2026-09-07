@@ -7,11 +7,11 @@ export class ReviewTokenType {
   @Field(() => ReviewKind)
   type: ReviewKind;
   @Field({
-    nullable: true
+    nullable: true,
   })
   projectId?: string;
   @Field({
-    nullable: true
+    nullable: true,
   })
   projectName?: string;
   @Field()

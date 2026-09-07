@@ -33,6 +33,9 @@ export class ProjectType {
   order: number;
   @Field(() => [ProjectImageType])
   images: ProjectImageType[];
-@Field(() => Language, { nullable: true, defaultValue: Language.RU })
-language?: Language;
+  @Field(() => Language, {
+    nullable: true,
+    defaultValue: Language.RU,
+  })
+  language?: Language;
 }

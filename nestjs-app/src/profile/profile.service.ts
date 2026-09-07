@@ -2,38 +2,44 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service.js';
 import { UpdateProfileInput } from './dto/update-profile.input.js';
 import { Language } from '../generated/prisma/client.js';
-
 @Injectable()
 export class ProfileService {
   constructor(private readonly prisma: PrismaService) {}
-
   async findRawFirst() {
     const profile = await this.prisma.profile.findFirst();
     if (!profile) throw new NotFoundException('Профиль не найден');
     return profile;
   }
-
   async findOneWithLang(lang: Language) {
     const [profile, reviewsCount] = await Promise.all([
       this.prisma.profile.findFirst({
         include: {
           profileTranslations: {
-            where: { language: lang },
+            where: {
+              language: lang,
+            },
           },
-          links: { orderBy: { order: 'asc' } },
-          skills: { orderBy: { order: 'asc' } },
+          links: {
+            orderBy: {
+              order: 'asc',
+            },
+          },
+          skills: {
+            orderBy: {
+              order: 'asc',
+            },
+          },
           _count: {
-            select: { projects: true },
+            select: {
+              projects: true,
+            },
           },
         },
       }),
       this.prisma.review.count(),
     ]);
-
     if (!profile) throw new NotFoundException('Профиль не найден');
-
     const translation = profile.profileTranslations[0];
-
     return {
       id: profile.id,
       email: profile.email,
@@ -51,23 +57,24 @@ export class ProfileService {
       projects: [],
     };
   }
-
   async update(input: UpdateProfileInput) {
     const profile = await this.findRawFirst();
     const { name, headline, description, location, email, language } = input;
     const targetLang = language ?? Language.RU;
-
     const hasTranslationFields =
       name !== undefined ||
       headline !== undefined ||
       description !== undefined ||
       location !== undefined;
-
     const [updatedProfile, reviewsCount] = await Promise.all([
       this.prisma.profile.update({
-        where: { id: profile.id },
+        where: {
+          id: profile.id,
+        },
         data: {
-          ...(email && { email }),
+          ...(email && {
+            email,
+          }),
           ...(hasTranslationFields
             ? {
                 profileTranslations: {
@@ -86,10 +93,18 @@ export class ProfileService {
                       location: location || null,
                     },
                     update: {
-                      ...(name !== undefined && { name }),
-                      ...(headline !== undefined && { headline }),
-                      ...(description !== undefined && { description }),
-                      ...(location !== undefined && { location }),
+                      ...(name !== undefined && {
+                        name,
+                      }),
+                      ...(headline !== undefined && {
+                        headline,
+                      }),
+                      ...(description !== undefined && {
+                        description,
+                      }),
+                      ...(location !== undefined && {
+                        location,
+                      }),
                     },
                   },
                 },
@@ -97,17 +112,31 @@ export class ProfileService {
             : {}),
         },
         include: {
-          profileTranslations: { where: { language: targetLang } },
-          links: { orderBy: { order: 'asc' } },
-          skills: { orderBy: { order: 'asc' } },
-          _count: { select: { projects: true } },
+          profileTranslations: {
+            where: {
+              language: targetLang,
+            },
+          },
+          links: {
+            orderBy: {
+              order: 'asc',
+            },
+          },
+          skills: {
+            orderBy: {
+              order: 'asc',
+            },
+          },
+          _count: {
+            select: {
+              projects: true,
+            },
+          },
         },
       }),
       this.prisma.review.count(),
     ]);
-
     const translation = updatedProfile.profileTranslations[0];
-
     return {
       id: updatedProfile.id,
       email: updatedProfile.email,

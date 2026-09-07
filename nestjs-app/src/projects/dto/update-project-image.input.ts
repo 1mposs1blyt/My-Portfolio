@@ -25,6 +25,9 @@ export class UpdateProjectImageInput {
   @IsOptional()
   @IsInt()
   order?: number;
-@Field(() => Language, { nullable: true, defaultValue: Language.RU })
-language?: Language;
+  @Field(() => Language, {
+    nullable: true,
+    defaultValue: Language.RU,
+  })
+  language?: Language;
 }

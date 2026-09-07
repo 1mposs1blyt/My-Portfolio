@@ -12,13 +12,14 @@ export function useAdminToken() {
     return () => window.removeEventListener(EVENT, sync);
   }, []);
   const setToken = useCallback((value: string) => {
-    if (value) sessionStorage.setItem(KEY, value);else sessionStorage.removeItem(KEY);
+    if (value) sessionStorage.setItem(KEY, value);
+    else sessionStorage.removeItem(KEY);
     setTokenState(value);
     window.dispatchEvent(new Event(EVENT));
   }, []);
   return {
     token,
     setToken,
-    isEditor: token.length > 0
+    isEditor: token.length > 0,
   };
 }

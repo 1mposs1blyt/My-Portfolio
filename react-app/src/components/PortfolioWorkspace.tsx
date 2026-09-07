@@ -32,7 +32,6 @@ export default function PortfolioWorkspace() {
   const [open, setOpen] = useState<Project | null>(null);
   const scope = useRef<HTMLDivElement>(null);
   const { loading, error, profile, reviews } = usePortfolioData(lang);
-
   const t = useMemo(() => {
     const projectsCount = profile?.projects?.length || 0;
     const reviewsCount = reviews?.length || 0;

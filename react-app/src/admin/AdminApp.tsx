@@ -9,7 +9,6 @@ import "./admin.css";
 import ReviewsPage from "./pages/ReviewsPage";
 import { ConfirmProvider } from "./ui/ConfirmProvider";
 import { AdminLangProvider } from "./AdminLangContext";
-
 export default function AdminApp() {
   const [active, setActive] = useState("profile");
   return (

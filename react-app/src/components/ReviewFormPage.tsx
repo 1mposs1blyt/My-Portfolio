@@ -5,7 +5,6 @@ import {
   getReviewFormLocalization,
   type UiLang,
 } from "../data/reviewFormLocalization";
-
 const screen: React.CSSProperties = {
   display: "flex",
   justifyContent: "center",
@@ -16,7 +15,6 @@ const screen: React.CSSProperties = {
   fontFamily: "monospace",
   padding: "1rem",
 };
-
 export default function ReviewFormPage({ token }: { token: string | null }) {
   const [uiLang, setUiLang] = useState<UiLang>(() =>
     typeof navigator !== "undefined" && navigator.language.startsWith("ru")
@@ -24,7 +22,6 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
       : "en",
   );
   const t = getReviewFormLocalization()[uiLang];
-
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [entered, setEntered] = useState("");
   const [activeToken, setActiveToken] = useState<string | null>(token);
@@ -34,15 +31,15 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
   const [text, setText] = useState("");
   const [rating, setRating] = useState(5);
   const [success, setSuccess] = useState(false);
-
   const [{ fetching, data, error }] = useQuery({
     query: VALIDATE_TOKEN_QUERY,
-    variables: { token: activeToken },
+    variables: {
+      token: activeToken,
+    },
     pause: !activeToken,
     requestPolicy: "network-only",
   });
   const [, executeMutation] = useMutation(SUBMIT_REVIEW_MUTATION);
-
   const field: React.CSSProperties = {
     width: "100%",
     background: "#0a0810",
@@ -53,17 +50,18 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
     outline: "none",
     boxShadow: "none",
   };
-
   const focus = (e: React.FocusEvent<HTMLElement>) =>
     (e.target.style.borderColor = "#8b5cf6");
   const blur = (e: React.FocusEvent<HTMLElement>) =>
     (e.target.style.borderColor = "#2a2140");
-
-  // переключатель языка интерфейса — рисуем на каждом экране
   const LangSwitch = () => (
     <div
       className="b-lang"
-      style={{ position: "static", display: "flex", gap: "0.25rem" }}
+      style={{
+        position: "static",
+        display: "flex",
+        gap: "0.25rem",
+      }}
     >
       <button
         type="button"
@@ -81,7 +79,6 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
       </button>
     </div>
   );
-
   const bar: React.CSSProperties = {
     display: "flex",
     justifyContent: "space-between",
@@ -90,9 +87,6 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
     background: "#1a1428",
     borderBottom: "1px solid #2a2140",
   };
-
-  // ------------------------------------------------------ ввод ключа
-
   if (!activeToken) {
     return (
       <div style={screen}>
@@ -109,7 +103,11 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
             <LangSwitch />
           </div>
 
-          <div style={{ padding: "1.5rem" }}>
+          <div
+            style={{
+              padding: "1.5rem",
+            }}
+          >
             <p
               style={{
                 marginTop: 0,
@@ -142,7 +140,11 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
 
             <button
               className="b-btn b-btn-main"
-              style={{ marginTop: "1rem", width: "100%", padding: "0.6rem" }}
+              style={{
+                marginTop: "1rem",
+                width: "100%",
+                padding: "0.6rem",
+              }}
               disabled={!entered.trim()}
               onClick={() => setActiveToken(entered.trim())}
             >
@@ -151,7 +153,11 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
 
             <button
               className="b-btn"
-              style={{ marginTop: "0.5rem", width: "100%", padding: "0.6rem" }}
+              style={{
+                marginTop: "0.5rem",
+                width: "100%",
+                padding: "0.6rem",
+              }}
               onClick={() => (window.location.href = "/")}
             >
               {t.toHome}
@@ -161,19 +167,26 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
       </div>
     );
   }
-
-  // -------------------------------------------------------- проверка
-
   if (fetching)
-    return <div style={{ ...screen, color: "#8B5CF6" }}>{t.checking}</div>;
-
+    return (
+      <div
+        style={{
+          ...screen,
+          color: "#8B5CF6",
+        }}
+      >
+        {t.checking}
+      </div>
+    );
   const tokenData = data?.validateReviewToken;
-
-  // ---------------------------------------------------------- ошибка
-
   if (error || !tokenData?.isValid) {
     return (
-      <div style={{ ...screen, color: "#FF3DA6" }}>
+      <div
+        style={{
+          ...screen,
+          color: "#FF3DA6",
+        }}
+      >
         <div
           className="b-window"
           style={{
@@ -190,7 +203,13 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
               alignItems: "center",
             }}
           >
-            <h3 style={{ margin: 0 }}>{t.errorTitle}</h3>
+            <h3
+              style={{
+                margin: 0,
+              }}
+            >
+              {t.errorTitle}
+            </h3>
             <LangSwitch />
           </div>
 
@@ -207,7 +226,10 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
 
           <button
             className="b-btn"
-            style={{ marginTop: "1rem", width: "100%" }}
+            style={{
+              marginTop: "1rem",
+              width: "100%",
+            }}
             onClick={() => {
               setActiveToken(null);
               setEntered("");
@@ -217,7 +239,10 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
           </button>
           <button
             className="b-btn"
-            style={{ marginTop: "0.5rem", width: "100%" }}
+            style={{
+              marginTop: "0.5rem",
+              width: "100%",
+            }}
             onClick={() => (window.location.href = "/")}
           >
             {t.errorBack}
@@ -226,14 +251,10 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
       </div>
     );
   }
-
-  // ---------------------------------------------------------- отправка
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!authorName || !text) return;
     setSubmitError(null);
-
     const result = await executeMutation({
       input: {
         token: activeToken,
@@ -245,16 +266,12 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
         language: uiLang.toUpperCase(),
       },
     });
-
     if (!result.error) {
       setSuccess(true);
     } else {
       setSubmitError(result.error.message.replace("[GraphQL] ", ""));
     }
   };
-
-  // ----------------------------------------------------------- успех
-
   if (success) {
     return (
       <div style={screen}>
@@ -268,7 +285,14 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
             border: "1px solid #2a2140",
           }}
         >
-          <h3 style={{ color: "#FF3DA6", margin: 0 }}>{t.successFile}</h3>
+          <h3
+            style={{
+              color: "#FF3DA6",
+              margin: 0,
+            }}
+          >
+            {t.successFile}
+          </h3>
           <p
             style={{
               marginTop: "1rem",
@@ -281,7 +305,10 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
           </p>
           <button
             className="b-btn b-btn-main"
-            style={{ marginTop: "1.5rem", width: "100%" }}
+            style={{
+              marginTop: "1.5rem",
+              width: "100%",
+            }}
             onClick={() => (window.location.href = "/")}
           >
             {t.toHome}
@@ -290,9 +317,6 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
       </div>
     );
   }
-
-  // ------------------------------------------------------------ форма
-
   return (
     <div style={screen}>
       <div
@@ -398,7 +422,11 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
               rows={5}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              style={{ ...field, resize: "none", lineHeight: 1.4 }}
+              style={{
+                ...field,
+                resize: "none",
+                lineHeight: 1.4,
+              }}
             />
           </div>
 
@@ -444,7 +472,12 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
             </div>
 
             {submitError && (
-              <div style={{ color: "#FF3DA6", fontSize: "0.85rem" }}>
+              <div
+                style={{
+                  color: "#FF3DA6",
+                  fontSize: "0.85rem",
+                }}
+              >
                 {submitError}
               </div>
             )}
@@ -452,7 +485,9 @@ export default function ReviewFormPage({ token }: { token: string | null }) {
             <button
               type="submit"
               className="b-btn b-btn-main"
-              style={{ padding: "0.6rem 1.5rem" }}
+              style={{
+                padding: "0.6rem 1.5rem",
+              }}
             >
               {t.submit}
             </button>

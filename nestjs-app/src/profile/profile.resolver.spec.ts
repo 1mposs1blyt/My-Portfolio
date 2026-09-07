@@ -7,23 +7,27 @@ describe('ProfileResolver', () => {
   let resolver: ProfileResolver;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ProfileResolver, {
-        provide: ProfileService,
-        useValue: {
-          update: vi.fn(),
-          findOne: vi.fn()
-        }
-      }, {
-        provide: PrismaService,
-        useValue: {
-          profile: {
-            findFirst: vi.fn().mockResolvedValue({
-              id: '1',
-              name: 'Alexander'
-            })
-          }
-        }
-      }]
+      providers: [
+        ProfileResolver,
+        {
+          provide: ProfileService,
+          useValue: {
+            update: vi.fn(),
+            findOne: vi.fn(),
+          },
+        },
+        {
+          provide: PrismaService,
+          useValue: {
+            profile: {
+              findFirst: vi.fn().mockResolvedValue({
+                id: '1',
+                name: 'Alexander',
+              }),
+            },
+          },
+        },
+      ],
     }).compile();
     resolver = module.get<ProfileResolver>(ProfileResolver);
   });

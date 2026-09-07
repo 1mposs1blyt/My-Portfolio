@@ -46,7 +46,9 @@ export default function ProjectsPage() {
   const { isEditor } = useAdminToken();
   const [{ data, fetching, error }] = useQuery({
     query: ADMIN_PROJECTS_QUERY,
-    variables: { lang },
+    variables: {
+      lang,
+    },
     requestPolicy: "network-only",
   });
   const [stackText, setStackText] = useState<Record<string, string>>({});
@@ -103,12 +105,10 @@ export default function ProjectsPage() {
       say("Название и описание обязательны");
       return;
     }
-
     const stack = (stackText[item.id] ?? "")
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
-
     const payload = {
       name: item.name,
       description: item.description,
@@ -118,34 +118,40 @@ export default function ProjectsPage() {
       order: item.order,
       language: lang,
     };
-
     if (!isEditor) {
       say("Демо-режим: не сохранено");
       return;
     }
-
     setSavingId(item.id);
     const isNew = item.id.startsWith("new-");
     const res = isNew
-      ? await createProject({ input: payload })
-      : await updateProject({ input: { id: item.id, ...payload } });
+      ? await createProject({
+          input: payload,
+        })
+      : await updateProject({
+          input: {
+            id: item.id,
+            ...payload,
+          },
+        });
     setSavingId(null);
-
     if (res.error) {
       say(res.error.message.replace("[GraphQL] ", ""));
       return;
     }
-
     if (isNew) {
       const newId = res.data.createProject.id;
-      // переносим текст стека под настоящий id, иначе поле опустеет
       setStackText((s) => {
         const { [item.id]: text, ...rest } = s;
-        return { ...rest, [newId]: text ?? "" };
+        return {
+          ...rest,
+          [newId]: text ?? "",
+        };
       });
-      patch(item.id, { id: newId });
+      patch(item.id, {
+        id: newId,
+      });
     }
-
     say("Сохранено");
   };
   const remove = async (item: Project) => {
@@ -341,7 +347,10 @@ export default function ProjectsPage() {
             <input
               value={stackText[item.id] ?? ""}
               onChange={(e) =>
-                setStackText((s) => ({ ...s, [item.id]: e.target.value }))
+                setStackText((s) => ({
+                  ...s,
+                  [item.id]: e.target.value,
+                }))
               }
               placeholder="TypeScript, React, Node.js"
             />

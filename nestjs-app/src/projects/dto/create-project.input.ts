@@ -9,7 +9,6 @@ import {
   IsUrl,
 } from 'class-validator';
 import { Language } from '../../generated/prisma/client.js';
-
 @InputType()
 export class CreateProjectInput {
   @Field()
@@ -44,7 +43,10 @@ export class CreateProjectInput {
   @IsOptional()
   @IsInt()
   order?: number;
-  @Field(() => Language, { nullable: true, defaultValue: Language.RU })
+  @Field(() => Language, {
+    nullable: true,
+    defaultValue: Language.RU,
+  })
   @IsOptional()
   @IsEnum(Language)
   language?: Language;

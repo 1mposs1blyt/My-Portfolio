@@ -15,34 +15,44 @@ import { LinksModule } from './links/links.module.js';
 import { ExperienceModule } from './experience/experience.module.js';
 import { UploadModule } from './upload/upload.module.js';
 @Module({
-  imports: [ConfigModule.forRoot({
-    isGlobal: true,
-    validate
-  }), ServeStaticModule.forRoot({
-    rootPath: join(process.cwd(), 'public'),
-    serveRoot: '/public'
-  }), PrismaModule,
-  GraphQLModule.forRoot<ApolloDriverConfig>({
-    driver: ApolloDriver,
-    autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-    playground: false,
-    introspection: process.env.NODE_ENV !== 'production',
-    plugins:
-      process.env.NODE_ENV === 'production'
-        ? []
-        : [ApolloServerPluginLandingPageLocalDefault()],
-    formatError: (error) => ({
-      message: error.message,
-      path: error.path,
-      extensions: {
-        code: error.extensions?.code,
-        ...(process.env.NODE_ENV !== 'production' && {
-          stacktrace: error.extensions?.stacktrace,
-        }),
-      },
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate,
     }),
-  }),
-    ProfileModule, ProjectsModule, SkillsModule, ReviewsModule, LinksModule, ExperienceModule, UploadModule],
-  providers: []
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'public'),
+      serveRoot: '/public',
+    }),
+    PrismaModule,
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      playground: false,
+      introspection: process.env.NODE_ENV !== 'production',
+      plugins:
+        process.env.NODE_ENV === 'production'
+          ? []
+          : [ApolloServerPluginLandingPageLocalDefault()],
+      formatError: (error) => ({
+        message: error.message,
+        path: error.path,
+        extensions: {
+          code: error.extensions?.code,
+          ...(process.env.NODE_ENV !== 'production' && {
+            stacktrace: error.extensions?.stacktrace,
+          }),
+        },
+      }),
+    }),
+    ProfileModule,
+    ProjectsModule,
+    SkillsModule,
+    ReviewsModule,
+    LinksModule,
+    ExperienceModule,
+    UploadModule,
+  ],
+  providers: [],
 })
-export class AppModule { }
+export class AppModule {}

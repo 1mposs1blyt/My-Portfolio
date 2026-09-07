@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useAdminToken } from "./hooks/useAdminToken";
 import { useAdminLang } from "./AdminLangContext";
-
 type Section = {
   id: string;
   label: string;
@@ -71,7 +70,12 @@ export default function AdminShell({
         <aside className="adm-side">
           <div className="adm-side-title">
             <div>Admin</div>
-            <div className="b-lang" style={{ position: "static" }}>
+            <div
+              className="b-lang"
+              style={{
+                position: "static",
+              }}
+            >
               <button
                 type="button"
                 onClick={() => setLang("RU")}

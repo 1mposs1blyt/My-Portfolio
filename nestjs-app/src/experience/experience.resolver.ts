@@ -9,9 +9,14 @@ import { Language } from '../generated/prisma/client.js';
 @Resolver(() => ExperienceType)
 export class ExperienceResolver {
   constructor(private readonly experienceService: ExperienceService) {}
-  @Query(() => [ExperienceType], { name: 'experience' })
+  @Query(() => [ExperienceType], {
+    name: 'experience',
+  })
   async getExperience(
-    @Args('lang', { type: () => Language, defaultValue: Language.RU })
+    @Args('lang', {
+      type: () => Language,
+      defaultValue: Language.RU,
+    })
     lang: Language,
   ) {
     return this.experienceService.findAllWithLang(lang);

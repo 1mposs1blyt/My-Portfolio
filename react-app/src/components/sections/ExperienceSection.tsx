@@ -18,12 +18,14 @@ interface ExperienceSectionProps {
 }
 export default function ExperienceSection({
   t,
-  experience
+  experience,
 }: ExperienceSectionProps) {
-  return <section className="b-section" data-section="experience">
+  return (
+    <section className="b-section" data-section="experience">
       <SectionHeader fileName="experience.log" title={t.headings.experience} />
       <div className="b-log">
-        {experience.map(e => <div className="b-job" key={e.company + e.startDate}>
+        {experience.map((e) => (
+          <div className="b-job" key={e.company + e.startDate}>
             <div className="b-job-when">
               {fmtDate(e.startDate, t)} — {fmtDate(e.endDate, t)}
             </div>
@@ -31,10 +33,18 @@ export default function ExperienceSection({
               {e.position} <span>· {e.company}</span>
             </div>
             {e.description && <div className="b-job-text">{e.description}</div>}
-            {e.achievements && e.achievements.length > 0 && <ul className="b-ach">
-                {[...e.achievements].sort((a, b) => a.order - b.order).map(a => <li key={a.text}>{a.text}</li>)}
-              </ul>}
-          </div>)}
+            {e.achievements && e.achievements.length > 0 && (
+              <ul className="b-ach">
+                {[...e.achievements]
+                  .sort((a, b) => a.order - b.order)
+                  .map((a) => (
+                    <li key={a.text}>{a.text}</li>
+                  ))}
+              </ul>
+            )}
+          </div>
+        ))}
       </div>
-    </section>;
+    </section>
+  );
 }

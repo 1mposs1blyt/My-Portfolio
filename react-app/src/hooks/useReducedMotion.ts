@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 export function useReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {

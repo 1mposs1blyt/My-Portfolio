@@ -4,22 +4,22 @@ import { CreateReviewInput } from './dto/create-review.input.js';
 import { ReviewKind } from './dto/reviews.type.js';
 import { CreateReviewTokenInput } from './dto/create-review-token.input.js';
 import { Language } from '../generated/prisma/client.js';
-
 @Injectable()
 export class ReviewsService {
   constructor(private readonly prisma: PrismaService) {}
-
   async findAllWithLang(lang: Language) {
     const reviews = await this.prisma.review.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: { reviewTranslations: true }, // было: where: { language: lang }
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        reviewTranslations: true,
+      },
     });
-
     return reviews.map((review) => {
       const t =
         review.reviewTranslations.find((x) => x.language === lang) ??
         review.reviewTranslations[0];
-
       return {
         id: review.id,
         type: review.type,
@@ -34,17 +34,18 @@ export class ReviewsService {
       };
     });
   }
-
   async validateToken(tokenId: string) {
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
     if (!uuidRegex.test(tokenId)) {
-      return { isValid: false };
+      return {
+        isValid: false,
+      };
     }
-
     const token = await this.prisma.reviewToken.findUnique({
-      where: { id: tokenId },
+      where: {
+        id: tokenId,
+      },
       include: {
         project: {
           include: {
@@ -53,19 +54,22 @@ export class ReviewsService {
         },
       },
     });
-
     if (!token) {
-      return { isValid: false };
+      return {
+        isValid: false,
+      };
     }
     if (token.isUsed) {
-      return { isValid: false };
+      return {
+        isValid: false,
+      };
     }
     if (token.expiresAt < new Date()) {
-      return { isValid: false };
+      return {
+        isValid: false,
+      };
     }
-
     const projectTranslation = (token.project as any)?.projectTranslations?.[0];
-
     return {
       isValid: true,
       type: token.type as ReviewKind,
@@ -73,7 +77,6 @@ export class ReviewsService {
       projectName: projectTranslation?.name || 'Project',
     };
   }
-
   async createWithToken(input: CreateReviewInput) {
     const tokenValidation = await this.validateToken(input.token);
     if (!tokenValidation.isValid) {
@@ -114,9 +117,10 @@ export class ReviewsService {
             },
           },
         },
-        include: { reviewTranslations: true },
+        include: {
+          reviewTranslations: true,
+        },
       });
-
       const t = review.reviewTranslations[0];
       return {
         id: review.id,
@@ -131,7 +135,6 @@ export class ReviewsService {
       };
     });
   }
-
   private mapToken(t: any) {
     const projectTranslation = t.project?.projectTranslations?.[0];
     return {
@@ -144,7 +147,6 @@ export class ReviewsService {
       createdAt: t.createdAt,
     };
   }
-
   async createToken(input: CreateReviewTokenInput) {
     if (input.type === ReviewKind.CLIENT && !input.projectId) {
       throw new BadRequestException(
@@ -169,7 +171,6 @@ export class ReviewsService {
     });
     return this.mapToken(token);
   }
-
   async findTokens() {
     const list = await this.prisma.reviewToken.findMany({
       orderBy: {
@@ -185,7 +186,6 @@ export class ReviewsService {
     });
     return list.map((t) => this.mapToken(t));
   }
-
   async revokeToken(id: string) {
     await this.prisma.reviewToken.delete({
       where: {
@@ -193,7 +193,6 @@ export class ReviewsService {
       },
     });
   }
-
   async removeReview(id: string) {
     await this.prisma.review.delete({
       where: {

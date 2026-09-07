@@ -1,5 +1,13 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
-import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { SkillCategory } from '../../generated/prisma/client.js';
 @InputType()
 export class CreateSkillInput {
@@ -11,7 +19,7 @@ export class CreateSkillInput {
   @IsEnum(SkillCategory)
   category: SkillCategory;
   @Field(() => Int, {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsInt()
@@ -19,7 +27,7 @@ export class CreateSkillInput {
   @Max(5)
   level?: number;
   @Field(() => Int, {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsInt()

@@ -14,28 +14,53 @@ const client = new Client({
       headers: {
         "apollo-require-preflight": "true",
         ...(token && {
-          Authorization: `Bearer ${token}`
-        })
-      }
+          Authorization: `Bearer ${token}`,
+        }),
+      },
     };
-  }
+  },
 });
 export default function App() {
-  const isAdmin = useMemo(() => typeof window !== "undefined" && window.location.pathname.startsWith("/admin"), []);
-  const isReview = useMemo(() => typeof window !== "undefined" && (window.location.pathname.startsWith("/review") || new URLSearchParams(window.location.search).has("review")), []);
+  const isAdmin = useMemo(
+    () =>
+      typeof window !== "undefined" &&
+      window.location.pathname.startsWith("/admin"),
+    [],
+  );
+  const isReview = useMemo(
+    () =>
+      typeof window !== "undefined" &&
+      (window.location.pathname.startsWith("/review") ||
+        new URLSearchParams(window.location.search).has("review")),
+    [],
+  );
   const reviewToken = useMemo(() => {
     if (typeof window === "undefined") return null;
     return new URLSearchParams(window.location.search).get("review");
   }, []);
-  return <Provider value={client}>
-      {isAdmin ? <Suspense fallback={<div style={{
-      padding: 24
-    }}>
+  return (
+    <Provider value={client}>
+      {isAdmin ? (
+        <Suspense
+          fallback={
+            <div
+              style={{
+                padding: 24,
+              }}
+            >
               Загрузка…
-            </div>}>
+            </div>
+          }
+        >
           <AdminApp />
-        </Suspense> : isReview ? <ReviewFormPage token={reviewToken} /> : <div className="app-container">
+        </Suspense>
+      ) : isReview ? (
+        <ReviewFormPage token={reviewToken} />
+      ) : (
+        <div className="app-container">
           <PortfolioWorkspace />
-        </div>}
-    </Provider>;
+        </div>
+      )}
+    </Provider>
+  );
 }
