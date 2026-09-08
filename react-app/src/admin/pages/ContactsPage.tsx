@@ -208,7 +208,7 @@ export default function ContactsPage() {
         <tbody>
           {rows.map((row) => (
             <tr key={row.id}>
-              <td>
+              <td data-label="Тип">
                 <select
                   value={row.kind}
                   onChange={(e) => {
@@ -229,7 +229,7 @@ export default function ContactsPage() {
                   ))}
                 </select>
               </td>
-              <td>
+              <td data-label="Подпись">
                 <input
                   value={row.label}
                   onChange={(e) =>
@@ -244,7 +244,7 @@ export default function ContactsPage() {
                   }
                 />
               </td>
-              <td>
+              <td data-label="Ссылка">
                 <input
                   value={row.url}
                   onChange={(e) =>
@@ -259,7 +259,7 @@ export default function ContactsPage() {
                   }
                 />
               </td>
-              <td>
+              <td data-label="Порядок">
                 <input
                   className="adm-num"
                   type="number"

@@ -207,7 +207,7 @@ export default function SkillsPage() {
         <tbody>
           {rows.map((row) => (
             <tr key={row.id}>
-              <td>
+              <td data-label="Название">
                 <input
                   value={row.name}
                   onChange={(e) =>
@@ -222,7 +222,7 @@ export default function SkillsPage() {
                   }
                 />
               </td>
-              <td>
+              <td data-label="Категория">
                 <select
                   value={row.category}
                   onChange={(e) => {
@@ -243,7 +243,7 @@ export default function SkillsPage() {
                   ))}
                 </select>
               </td>
-              <td>
+              <td data-label="Уровень">
                 <div
                   className="adm-level"
                   role="group"
@@ -282,7 +282,7 @@ export default function SkillsPage() {
           ))}
 
           <tr className="adm-row-new">
-            <td>
+            <td data-label="Название">
               <input
                 value={draft.name}
                 placeholder="Новый навык"
@@ -295,7 +295,7 @@ export default function SkillsPage() {
                 onKeyDown={(e) => e.key === "Enter" && add()}
               />
             </td>
-            <td>
+            <td data-label="Категория">
               <select
                 value={draft.category}
                 onChange={(e) =>

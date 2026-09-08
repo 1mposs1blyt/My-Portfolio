@@ -289,9 +289,9 @@ export default function ReviewsPage() {
                 const expired = new Date(t.expiresAt) < new Date();
                 return (
                   <tr key={t.id}>
-                    <td>{t.type === "CLIENT" ? "Заказчик" : "Работодатель"}</td>
-                    <td>{t.projectName ?? "—"}</td>
-                    <td>
+                    <td data-label="Тип">{t.type === "CLIENT" ? "Заказчик" : "Работодатель"}</td>
+                    <td data-label="Проект">{t.projectName ?? "—"}</td>
+                    <td data-label="Статус">
                       {t.isUsed ? (
                         <span className="adm-hint">использована</span>
                       ) : expired ? (
@@ -305,7 +305,7 @@ export default function ReviewsPage() {
                         </button>
                       )}
                     </td>
-                    <td className="adm-hint">{fmt(t.expiresAt)}</td>
+                    <td data-label="Истекает" className="adm-hint">{fmt(t.expiresAt)}</td>
                     <td className="adm-td-right">
                       <button
                         className="adm-del"

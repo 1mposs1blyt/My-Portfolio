@@ -191,6 +191,8 @@
 .adm-field textarea,
 .adm-field select {
   font: inherit;
+  min-width: 0;
+  max-width: 100%;
   padding: 8px 10px;
   background: var(--panel);
   border: 1px solid var(--line);
@@ -206,39 +208,12 @@
 }
 .adm-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
   margin-top: 20px;
 }
 
-@media (max-width: 800px) {
-  .adm-body {
-    flex-direction: column;
-  }
-  .adm-side {
-    width: 100%;
-    min-height: 0;
-    position: static;
-    border-right: none;
-    border-bottom: 1px solid var(--line);
-  }
-  .adm-nav {
-    flex-direction: row;
-    overflow-x: auto;
-  }
-  .adm-nav button {
-    white-space: nowrap;
-    border-left: none;
-    border-bottom: 2px solid transparent;
-  }
-  .adm-nav button[data-on="true"] {
-    border-left: none;
-    border-bottom-color: var(--magenta);
-  }
-  .adm-main {
-    padding: 20px 16px 60px;
-  }
-}
 .adm-page-wide {
   max-width: 900px;
 }
@@ -274,6 +249,7 @@
 .adm-table select {
   font: inherit;
   width: 100%;
+  min-width: 0;
   padding: 6px 8px;
   background: var(--panel);
   border: 1px solid transparent;
@@ -340,11 +316,6 @@
   grid-template-columns: 1fr 1fr;
   gap: 0 16px;
 }
-@media (max-width: 700px) {
-  .adm-grid2 {
-    grid-template-columns: 1fr;
-  }
-}
 
 .adm-check {
   display: flex;
@@ -366,6 +337,7 @@
 }
 .adm-ach-row input {
   flex: 1;
+  min-width: 0;
 }
 
 .adm-icon {
@@ -423,6 +395,7 @@
 }
 .adm-link-box input {
   flex: 1;
+  min-width: 0;
   font: inherit;
   font-size: 12.5px;
   padding: 6px 8px;
@@ -455,6 +428,7 @@
 }
 .adm-review p {
   margin: 6px 0 0;
+  overflow-wrap: anywhere;
 }
 .adm-modal {
   position: fixed;
@@ -505,4 +479,183 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+/* ================= мобильная разметка ================= */
+/* важно: секция идёт последней в файле, иначе .adm-page-wide и прочие
+   правила ниже перебивают медиа-запрос по специфичности порядка */
+
+@media (max-width: 800px) {
+  .adm-root {
+    overflow-x: hidden;
+  }
+
+  /* корень бага: в колонке align-items:flex-start ужимал side и main
+     по контенту -> горизонтальный скролл и обрезанные вкладки */
+  .adm-body {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .adm-side {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    position: static;
+    padding: 12px 0;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .adm-main {
+    width: 100%;
+    min-width: 0;
+    padding: 20px 16px 60px;
+  }
+  .adm-page,
+  .adm-page-wide {
+    max-width: 100%;
+  }
+
+  .adm-banner {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    line-height: 1.45;
+  }
+  .adm-banner a {
+    margin-left: 0;
+  }
+
+  /* вкладки скроллятся внутри себя, а не тянут страницу */
+  .adm-nav {
+    flex: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding: 6px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .adm-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .adm-nav button {
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    padding: 8px 12px;
+  }
+  .adm-nav button[data-on="true"] {
+    border-left: none;
+    border-bottom-color: var(--magenta);
+  }
+
+  .adm-grid2 {
+    grid-template-columns: 1fr;
+  }
+  .adm-card {
+    padding: 16px 14px;
+  }
+  .adm-h1 {
+    font-size: 20px;
+  }
+
+  /* таблицы -> карточки: колонки на 360px не живут */
+  .adm-table,
+  .adm-table thead,
+  .adm-table tbody,
+  .adm-table tr,
+  .adm-table th,
+  .adm-table td {
+    display: block;
+    width: 100%;
+  }
+  .adm-table thead {
+    display: none;
+  }
+  .adm-table tr {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .adm-table td,
+  .adm-table td:first-child {
+    width: 100%;
+    padding: 5px 0;
+    border-bottom: none;
+  }
+  .adm-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 3px;
+    font-size: 11.5px;
+    color: var(--dim);
+  }
+  .adm-table td:empty {
+    display: none;
+  }
+  .adm-table td.adm-td-right {
+    text-align: right;
+  }
+  .adm-table input,
+  .adm-table select {
+    width: 100%;
+    padding: 8px;
+    border-color: var(--line);
+  }
+  .adm-num {
+    width: 100%;
+    text-align: left;
+  }
+  .adm-row-new td {
+    background: none;
+  }
+  .adm-row-new {
+    background: rgba(139, 92, 246, 0.07);
+    border-color: var(--violet);
+  }
+  .adm-row-new .adm-btn {
+    width: 100%;
+    padding: 8px 10px;
+  }
+
+  /* полоски уровня — под палец */
+  .adm-level {
+    gap: 4px;
+  }
+  .adm-level button {
+    flex: 1;
+    height: 22px;
+    width: auto;
+  }
+
+  .adm-link-box {
+    flex-direction: column;
+  }
+  .adm-review-meta {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+  .adm-ach-row {
+    flex-wrap: wrap;
+  }
+  .adm-ach-row input {
+    flex-basis: 100%;
+  }
+  .adm-shot {
+    width: calc(50% - 5px);
+  }
+  .adm-del,
+  .adm-icon {
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .adm-main {
+    padding: 16px 12px 56px;
+  }
+  .adm-actions .adm-btn {
+    flex: 1 1 auto;
+  }
 }
