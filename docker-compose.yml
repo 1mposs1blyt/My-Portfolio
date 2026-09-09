@@ -31,11 +31,24 @@ services:
       PORT: "3000"
       NODE_ENV: "production"
       ADMIN_TOKEN: "${ADMIN_TOKEN}"
-    ports:
-      - "127.0.0.1:3000:3000" # Открываем порт бэкенда СТРОГО для локального Nginx
     volumes:
-      # Мапим загрузки в реальную папку на сервере
-      - /var/www/portfolio-uploads:/app/public/uploads 
+      - uploads:/app/public/uploads
+
+  web:
+    build:
+      context: ./react-app
+      args:
+        VITE_BACKEND_URL: ""
+    environment:
+      BACKEND_ORIGIN: "http://app:3000"
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/nginx/certs
 
 volumes:
   db-data:
+  uploads:
