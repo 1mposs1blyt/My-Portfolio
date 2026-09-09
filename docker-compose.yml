@@ -9,6 +9,8 @@ services:
       - "5433:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+    networks:
+      - project-network                      # <-- Добавили сеть
     healthcheck:
       test:
         [
@@ -33,8 +35,11 @@ services:
       ADMIN_TOKEN: "${ADMIN_TOKEN}"
     volumes:
       - uploads:/app/public/uploads
+    networks:
+      - project-network                      # <-- Добавили сеть
 
   web:
+    container_name: portfolio-frontend
     build:
       context: ./react-app
       args:
@@ -43,12 +48,17 @@ services:
       BACKEND_ORIGIN: "http://app:3000"
     depends_on:
       - app
-    ports:
-      - "80:80"
-      - "443:443"
+    networks:
+      - project-network                      # Для связи с бэкендом (app)
+      - proxy-network                        # Для связи с внешним главным прокси
     volumes:
       - /etc/letsencrypt:/etc/nginx/certs
 
 volumes:
   db-data:
   uploads:
+
+networks:
+  project-network:
+  proxy-network:
+    external: true

@@ -1,12 +1,3 @@
-# Образ nginx:alpine на старте прогоняет файлы из /etc/nginx/templates/
-# через envsubst и кладёт результат в /etc/nginx/conf.d/.
-# Подставляются только объявленные переменные окружения, так что
-# nginx-овские $uri и $host остаются нетронутыми.
-#
-# BACKEND_ORIGIN — куда проксировать API:
-#   в общем compose  → http://app:3000
-#   при отдельном    → http://192.168.1.62:3333
-
 server {
   listen 80;
   server_name _;
@@ -21,7 +12,8 @@ server {
   location /graphql {
     proxy_pass ${BACKEND_ORIGIN};
     proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
+    # Изменено: берем IP из заголовка, который передал главный прокси
+    proxy_set_header X-Real-IP $http_x_real_ip;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
   }
@@ -30,11 +22,9 @@ server {
     proxy_pass ${BACKEND_ORIGIN};
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    # без этого скриншот больше 1 МБ упадёт с 413
     client_max_body_size 10m;
   }
 
-  # загруженные картинки раздаёт Nest через ServeStaticModule
   location ^~ /public/ {
     proxy_pass ${BACKEND_ORIGIN};
     proxy_set_header Host $host;
@@ -48,7 +38,6 @@ server {
     try_files $uri =404;
   }
 
-  # SPA-фоллбэк: без него прямой заход на /admin и /review даст 404
   location / {
     try_files $uri $uri/ /index.html;
   }
