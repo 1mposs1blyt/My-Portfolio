@@ -22,6 +22,7 @@ services:
 
   app:
     build: ./nestjs-app
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
@@ -30,26 +31,11 @@ services:
       PORT: "3000"
       NODE_ENV: "production"
       ADMIN_TOKEN: "${ADMIN_TOKEN}"
-    volumes:
-      - uploads:/app/public/uploads
-    # ports:
-    #   - "3000:3000"
-
-  web:
-    build:
-      context: ./react-app
-      args:
-        VITE_BACKEND_URL: ""
-    environment:
-      BACKEND_ORIGIN: "http://app:3000"
-    depends_on:
-      - app
     ports:
-      - "80:80" # Сюда будут приходить обычные запросы и проверки Certbot
-      - "443:443" # Сюда будут приходить запросы HTTPS
+      - "127.0.0.1:3000:3000" # Открываем порт бэкенда СТРОГО для локального Nginx
     volumes:
-      # Пробрасываем папку с ключами внутрь контейнера
-      - /etc/letsencrypt:/etc/nginx/certs
+      # Мапим загрузки в реальную папку на сервере
+      - /var/www/portfolio-uploads:/app/public/uploads 
+
 volumes:
   db-data:
-  uploads:

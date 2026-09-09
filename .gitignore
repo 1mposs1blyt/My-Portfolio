@@ -1,8 +1,9 @@
 node_modules
 plan.md
 .env
-backup
+backup-*
 backup*.sql
 backup*.sql
 backup*.*
 uploads.tar.gz
+duckdns-auth.py
